@@ -1,0 +1,73 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:05.600
+Así convertí un modelo de Revit en una plataforma 4D interactiva.
+
+2
+00:00:05.900 --> 00:00:13.100
+Todo parte del modelo federado de Revit: arquitectura, estructura y seis modelos de instalaciones.
+
+3
+00:00:13.300 --> 00:00:21.500
+En la plataforma, cada disciplina se revisa por separado: el modelo completo, la estructura o las instalaciones.
+
+4
+00:00:21.900 --> 00:00:27.900
+La desarrollé con agentes de inteligencia artificial, que me ayudaron a programar la automatización en C#, PowerShell y JavaScript.
+
+5
+00:00:28.100 --> 00:00:34.000
+Los scripts leen el modelo, cuantifican cada elemento y enlazan el programa de obra con una página web 3D.
+
+6
+00:00:34.500 --> 00:00:41.400
+En la planeación 4D, el programa de obra construye el modelo día por día.
+
+7
+00:00:41.700 --> 00:00:48.600
+64 actividades y 5 hitos: se ve qué se demuele, qué se construye y cómo avanza cada frente.
+
+8
+00:00:48.900 --> 00:00:57.200
+Las oficinas existentes siguen operando mientras avanza la ampliación.
+
+9
+00:00:57.608 --> 00:01:04.808
+Las instalaciones se eligen desde el panel de sistemas: agua fría, drenaje sanitario, aire acondicionado o eléctrica.
+
+10
+00:01:05.108 --> 00:01:14.725
+Se pueden combinar varios sistemas y filtrar por nivel, con cortes que dejan ver cada red.
+
+11
+00:01:14.975 --> 00:01:23.733
+Con la herramienta de propiedades, un clic muestra los datos de Revit de cada elemento: sistema, tipo, medida, nivel y longitud.
+
+12
+00:01:23.983 --> 00:01:29.983
+Las cantidades siguen el mismo filtro: por sistema, por nivel y por zona.
+
+13
+00:01:30.283 --> 00:01:35.608
+Y se exportan a Excel con un clic.
+
+14
+00:01:35.758 --> 00:01:40.608
+La tabla queda lista para armar el presupuesto mucho más rápido.
+
+15
+00:01:40.758 --> 00:01:46.483
+Y el antes y el después se comparan sobre el mismo modelo.
+
+16
+00:01:46.733 --> 00:01:55.933
+El resultado: comunicación clara con el cliente y la obra, presupuestos más rápidos, decisiones con fecha y un solo modelo como fuente de información.
+
+17
+00:01:56.233 --> 00:02:00.233
+Una plataforma programable, personalizable y ampliable con automatización, inteligencia artificial y programación.
+
+18
+00:02:00.433 --> 00:02:03.233
+Soy Dominic Soto Aguilar, arquitecto especializado en modelado y coordinación BIM.
