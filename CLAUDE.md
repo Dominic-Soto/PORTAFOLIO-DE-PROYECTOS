@@ -86,4 +86,4 @@ El Chromium de Playwright no trae H.264 (`canPlayType` vacío), así que ahí el
 
 ## Notas / pendientes
 
-- La tarjeta de cada libro dice "1920 × 1080", pero las láminas son de 2560×1440.
+- Sin pendientes. (La tarjeta de cada libro ya indica 2560 × 1440, el tamaño real de las láminas.)
