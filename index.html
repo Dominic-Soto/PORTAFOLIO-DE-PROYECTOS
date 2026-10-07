@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PORTAFOLIOS DE PROYECTOS</title>
-<meta name="description" content="Dominic Soto Aguilar · Arquitecto · Modelado y coordinación BIM. Tres portafolios para hojear como libro: arquitectura industrial, diseño arquitectónico y proyectos ejecutivos BIM.">
+<meta name="description" content="Dominic Soto Aguilar · Arquitecto · Modelado y coordinación BIM. Tres portafolios para hojear como libro (arquitectura industrial, diseño arquitectónico y proyectos ejecutivos BIM) y el video de una plataforma 4D desarrollada con IA a partir de un modelo de Revit.">
 <meta name="author" content="Dominic Soto Aguilar">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23252523'/%3E%3Cpath d='M14 18h16v30H14zM34 18h16v30H34z' fill='none' stroke='%23E8E7E3' stroke-width='3'/%3E%3C/svg%3E">
 <link rel="canonical" href="https://dominic-soto.github.io/PORTAFOLIO-DE-PROYECTOS/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_MX">
 <meta property="og:title" content="PORTAFOLIOS DE PROYECTOS">
-<meta property="og:description" content="Dominic Soto Aguilar · Arquitecto · Modelado y coordinación BIM. Tres portafolios para hojear como libro: arquitectura industrial, diseño arquitectónico y proyectos ejecutivos BIM.">
+<meta property="og:description" content="Dominic Soto Aguilar · Arquitecto · Modelado y coordinación BIM. Tres portafolios para hojear como libro (arquitectura industrial, diseño arquitectónico y proyectos ejecutivos BIM) y el video de una plataforma 4D desarrollada con IA a partir de un modelo de Revit.">
 <meta property="og:url" content="https://dominic-soto.github.io/PORTAFOLIO-DE-PROYECTOS/">
 <meta property="og:image" content="https://dominic-soto.github.io/PORTAFOLIO-DE-PROYECTOS/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PORTAFOLIOS DE PROYECTOS">
-<meta name="twitter:description" content="Dominic Soto Aguilar · Arquitecto · Modelado y coordinación BIM. Tres portafolios para hojear como libro: arquitectura industrial, diseño arquitectónico y proyectos ejecutivos BIM.">
+<meta name="twitter:description" content="Dominic Soto Aguilar · Arquitecto · Modelado y coordinación BIM. Tres portafolios para hojear como libro (arquitectura industrial, diseño arquitectónico y proyectos ejecutivos BIM) y el video de una plataforma 4D desarrollada con IA a partir de un modelo de Revit.">
 <meta name="twitter:image" content="https://dominic-soto.github.io/PORTAFOLIO-DE-PROYECTOS/og.jpg">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -106,6 +106,39 @@ button, select { font: inherit; color: inherit; }
 @media (max-width: 720px) {
   .masthead { grid-template-columns: minmax(0, 1fr); }
   .masthead .lead { text-align: left; }
+}
+
+/* ------------------------------------------------ desarrollo: plataforma 4D (bloque de portada y video) */
+.feature { --accent: var(--tec); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(28px, 4vw, 56px); align-items: center; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.feat-media { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #0B1520; box-shadow: var(--drop); }
+.feat-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.feat-media:hover img, .feat-media:focus-visible img { transform: scale(1.025); }
+.feat-media:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+.play { position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%; background: rgba(255, 255, 255, .92); display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+.play svg { width: 24px; height: 24px; fill: #252523; margin-left: 4px; }
+.feat-text { grid-column: span 2; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.feat-text .kicker { color: var(--accent); }
+.feat-text h2 { margin: 0; font-weight: 300; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; letter-spacing: .02em; }
+.feat-text p { margin: 0; color: var(--muted); max-width: 52ch; }
+.feat-stats { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; letter-spacing: .06em; color: var(--muted); }
+.feat-stats b { display: block; font-weight: 200; font-size: 30px; line-height: 1.15; letter-spacing: 0; color: var(--ink); }
+.cta { align-self: flex-start; margin-top: 6px; padding-bottom: 2px; border-bottom: 1px solid transparent; font-size: 11px; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+.cta:hover, .cta:focus-visible { border-color: var(--accent); }
+.vview { --accent: var(--tec); position: fixed; inset: 0; z-index: 10; background: var(--ground); display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.vview[hidden] { display: none !important; }
+.vbody { overflow-y: auto; padding: clamp(16px, 3vw, 36px) var(--gutter) 48px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+.vbody video { display: block; width: min(100%, 1400px, calc((100dvh - 200px) * 16 / 9)); aspect-ratio: 16 / 9; background: #0B1520; box-shadow: var(--drop); }
+.vinfo { width: min(100%, 1400px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 20px clamp(24px, 4vw, 56px); }
+.vinfo p { margin: 0; color: var(--muted); }
+.benefits { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.benefits li { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.benefits b { font-weight: 500; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink); }
+@media (max-width: 860px) {
+  .feature, .vinfo, .benefits { grid-template-columns: minmax(0, 1fr); }
+  .feat-text { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feat-media img { transition: none; }
 }
 
 /* ------------------------------------------------ visor */
@@ -207,6 +240,24 @@ select.jump { height: 36px; border: 1px solid var(--line); background: var(--gro
 
   <section class="shelf" id="shelf" aria-label="Portafolios"></section>
 
+  <section class="feature" aria-labelledby="featTitle">
+    <a class="feat-media" href="#video" aria-label="Ver el video de la plataforma 4D">
+      <img src="video/plataforma-4d-bim.jpg" width="1920" height="1080" loading="lazy" alt="Plataforma 4D interactiva generada a partir de un modelo de Revit">
+      <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+    </a>
+    <div class="feat-text">
+      <div class="kicker">Desarrollo · BIM + IA</div>
+      <h2 id="featTitle">Plataforma 4D interactiva</h2>
+      <p>Del modelo de Revit a una página web 4D que integra el programa de obra, las instalaciones y las cuantificaciones del proyecto. Desarrollada con agentes de IA, automatización y programación.</p>
+      <ul class="feat-stats">
+        <li><b class="num">8,019</b>elementos cuantificados</li>
+        <li><b class="num">64</b>actividades · 5 hitos</li>
+        <li><b class="num">16</b>sistemas de instalaciones</li>
+      </ul>
+      <a class="cta" href="#video">Ver video →</a>
+    </div>
+  </section>
+
   <footer class="contact">
     <span class="who">Contacto</span>
     <span class="sel" id="mail">dominicsoto.arq@gmail.com</span>
@@ -215,6 +266,30 @@ select.jump { height: 36px; border: 1px solid var(--line); background: var(--gro
     <span>Querétaro, México</span>
   </footer>
 </main>
+
+<section class="vview" id="vview" hidden aria-labelledby="vTitle">
+  <div class="bar">
+    <button class="tool" id="vBack" type="button" aria-label="Volver a los portafolios" title="Volver a los portafolios">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span class="lbl">Portafolios</span>
+    </button>
+    <div class="title"><strong id="vTitle">Plataforma 4D · BIM + IA</strong><span id="vSub">Dominic Soto Aguilar · Video</span></div>
+  </div>
+  <div class="vbody">
+    <video id="vid" controls preload="metadata" playsinline poster="video/plataforma-4d-bim.jpg">
+      <source src="video/plataforma-4d-bim.mp4" type="video/mp4">
+      <track kind="subtitles" src="video/plataforma-4d-bim.vtt" srclang="es" label="Español">
+      <a href="video/plataforma-4d-bim.mp4">Descargar el video</a>
+    </video>
+    <div class="vinfo">
+      <p>Plataforma web 4D desarrollada a partir de un modelo de Revit con agentes de IA, automatización y programación. Programable, personalizable y ampliable a cada proyecto.</p>
+      <ul class="benefits">
+        <li><b>Presupuesto más rápido</b>Cuantificaciones automáticas por sistema, nivel y actividad.</li>
+        <li><b>Comunicación clara</b>Cliente, obra y diseño ven la misma secuencia 4D.</li>
+        <li><b>Un solo modelo</b>Revit alimenta la geometría, el programa de obra y las cantidades.</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
 <section class="viewer" id="viewer" hidden aria-label="Visor de portafolio">
   <div class="bar">
@@ -523,7 +598,24 @@ function openZoom() {
   pan.addEventListener("pointerup", end); pan.addEventListener("pointercancel", end);
 })();
 
+/* ---------------- video de la plataforma 4D (sección independiente: #video) */
+function openVideo() {
+  if (S.book) closeBook();
+  $("home").hidden = true; $("vview").hidden = false;
+  if (location.hash !== "#video") { try { history.replaceState(null, "", "#video"); } catch (e) {} }
+}
+function closeVideo(clearHash = true) {
+  const v = $("vid"); if (!v.paused) v.pause();
+  $("vview").hidden = true; $("home").hidden = false;
+  if (clearHash) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
+}
+$("vid").addEventListener("loadedmetadata", (e) => {
+  const s = Math.round(e.target.duration);
+  if (s) $("vSub").textContent = `Dominic Soto Aguilar · Video de ${Math.floor(s / 60)}:${pad(s % 60)} min`;
+});
+
 /* ---------------- eventos */
+$("vBack").addEventListener("click", () => closeVideo());
 $("prev").addEventListener("click", (e) => { e.stopPropagation(); go(S.page - 1); });
 $("next").addEventListener("click", (e) => { e.stopPropagation(); go(S.page + 1); });
 $("back").addEventListener("click", closeBook);
@@ -569,6 +661,7 @@ $("copyMail").addEventListener("click", async () => {
 })();
 
 document.addEventListener("keydown", (e) => {
+  if (!$("vview").hidden) { if (e.key === "Escape" && !document.fullscreenElement) closeVideo(); return; }
   if ($("viewer").hidden) return;
   if (e.target.closest && e.target.closest("select")) return;
   if (e.key === "Escape") {
@@ -586,10 +679,12 @@ document.addEventListener("keydown", (e) => {
 });
 addEventListener("resize", () => { if (!$("zoom").hidden) applyZoom(); });
 
-/* enlaces directos: #industrial, #arquitectura, #tecnico o #tecnico-12 */
+/* enlaces directos: #industrial, #arquitectura, #tecnico, #tecnico-12 o #video */
 function route() {
   const h = decodeURIComponent(location.hash.slice(1));
   const [id, p] = h.split("-");
+  if (id === "video") { if ($("vview").hidden) openVideo(); return; }
+  if (!$("vview").hidden) closeVideo(false);
   if (BOOKS[id]) { if (S.book !== id) openBook(id, Number(p) || 1); else if (Number(p)) go(Number(p), false); }
   else if (S.book) closeBook();
 }
