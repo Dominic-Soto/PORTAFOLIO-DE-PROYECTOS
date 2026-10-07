@@ -1,0 +1,26 @@
+// Fotografías del estado actual (levantamiento 2024). "video: true" = se usan en la animación.
+window.AUO_FOTOS = [
+  { archivo: '01_fachada_principal.jpg', titulo: 'Fachada principal con pórtico de acceso', nivel: 'Exterior', fecha: '31 may 2024', video: true },
+  { archivo: '02_vista_general.jpg', titulo: 'Vista general desde el estacionamiento de visitas', nivel: 'Exterior', fecha: '31 may 2024' },
+  { archivo: '08_ala_servicios_exterior.jpg', titulo: 'Ala de servicios, carpa de lockers y terraza superior', nivel: 'Exterior · zona de ampliación', fecha: '31 may 2024', video: true },
+  { archivo: '09_carpa_lockers_exterior.jpg', titulo: 'Carpa de lockers frente al ala de servicios', nivel: 'Exterior · zona de ampliación', fecha: 'ago 2024' },
+  { archivo: '23_azotea_ala.jpg', titulo: 'Azotea del ala de servicios', nivel: 'Azotea · zona de ampliación', fecha: '31 may 2024' },
+  { archivo: '22_terraza_pa.jpg', titulo: 'Terraza con velaria sobre el ala de servicios', nivel: 'Planta alta · zona de ampliación', fecha: '31 may 2024', video: true },
+  { archivo: '16_carpa_lockers_interior.jpg', titulo: 'Interior de la carpa de lockers', nivel: 'Exterior · zona de ampliación', fecha: 'ago 2024' },
+  { archivo: '10_acceso_lateral_ala.jpg', titulo: 'Acceso lateral y gabinetes contra incendio', nivel: 'Exterior · patio de servicio', fecha: 'ago 2024' },
+  { archivo: '11_pasillo_servicios_pb.jpg', titulo: 'Pasillo de servicios: enfermería y sanitarios', nivel: 'Planta baja · ala de servicios', fecha: 'ago 2024' },
+  { archivo: '12_sanitarios_pb_lavabos.jpg', titulo: 'Sanitarios PB: lavabos y espejo corrido', nivel: 'Planta baja · ala de servicios', fecha: 'ago 2024', video: true },
+  { archivo: '13_sanitarios_pb_mamparas.jpg', titulo: 'Sanitarios PB: mamparas y mingitorio', nivel: 'Planta baja · ala de servicios', fecha: 'ago 2024' },
+  { archivo: '14_vestidor_lockers.jpg', titulo: 'Vestidor interior con lockers metálicos', nivel: 'Planta baja · ala de servicios', fecha: '9 ago 2024' },
+  { archivo: '15_enfermeria.jpg', titulo: 'Enfermería: área de consulta', nivel: 'Planta baja · ala de servicios', fecha: '9 ago 2024' },
+  { archivo: '03_portico_acceso.jpg', titulo: 'Pórtico de acceso con marcos azules', nivel: 'Exterior · acceso principal', fecha: 'ago 2024' },
+  { archivo: '04_lobby.jpg', titulo: 'Lobby con muro de exhibición de producto', nivel: 'Planta baja · lobby', fecha: '31 may 2024' },
+  { archivo: '05_escalera.jpg', titulo: 'Lobby y escalera principal a planta alta', nivel: 'Planta baja · lobby', fecha: 'ago 2024' },
+  { archivo: '06_pasillo_pb.jpg', titulo: 'Pasillo de planta baja con mural', nivel: 'Planta baja · pasillo', fecha: 'ago 2024' },
+  { archivo: '07_comedor.jpg', titulo: 'Comedor con plafón naranja y ventanal', nivel: 'Planta baja · comedor', fecha: 'ago 2024' },
+  { archivo: '17_oficinas_pa.jpg', titulo: 'Oficinas abiertas en planta alta', nivel: 'Planta alta · oficinas', fecha: 'ago 2024' },
+  { archivo: '18_pasillo_salas_pa.jpg', titulo: 'Pasillo de salas de juntas con vista a la nave', nivel: 'Planta alta · salas de juntas', fecha: '31 may 2024' },
+  { archivo: '19_sala_juntas_pa.jpg', titulo: 'Sala de juntas con cancel de vidrio', nivel: 'Planta alta · sala de juntas', fecha: '31 may 2024' },
+  { archivo: '20_oficinas_privadas_pa.jpg', titulo: 'Oficinas privadas y salas acristaladas', nivel: 'Planta alta · privados', fecha: 'ago 2024' },
+  { archivo: '21_area_cafe_pa.jpg', titulo: 'Área de café e impresión', nivel: 'Planta alta · café', fecha: 'ago 2024' }
+];
