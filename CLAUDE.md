@@ -9,7 +9,7 @@ Tres portafolios que se hojean como libro (con animación de página) o se recor
 
 - Sitio: https://dominic-soto.github.io/PORTAFOLIO-DE-PROYECTOS/
 - Enlaces directos: `#industrial`, `#arquitectura`, `#tecnico`, a una página: `#tecnico-12`, y al video: `#video`
-- Además de los libros, la portada tiene un bloque **Desarrollo · BIM + IA** que lleva a la sección independiente del video de la plataforma 4D.
+- En la repisa de la portada, junto a los tres libros, va una cuarta tarjeta **04 · Implementación BIM + IA** que abre la sección independiente del video de la plataforma 4D.
 
 ## Estructura
 
@@ -36,12 +36,12 @@ Los archivos van numerados con dos dígitos: `p01.webp`, `p02.webp`, …
 - **Datos**: el objeto `BOOKS` define cada libro: número, título, total de páginas y `sections` (`[nombre, página de inicio]`).
   Es la única fuente de verdad para el selector de secciones, las etiquetas de página y la lista de proyectos de la portada.
 - `PROJECT_SKIP`: secciones que *no* son proyectos (Portada, Perfil, Contacto, …); se excluyen de la lista de la tarjeta.
-- **Portada** (`#home`): repisa con los tres libros (`buildShelf`), bloque `.feature` de la plataforma 4D y datos de contacto.
+- **Portada** (`#home`): repisa (`buildShelf`) con los tres libros y la tarjeta 04 del video (`.book-card.is-video`, sin canto de hojas, con botón `.play`); 4 columnas en escritorio, 2×2 debajo de 1180 px y 1 columna en móvil; datos de contacto.
 - **Video** (`#vview`): vista independiente (`openVideo`/`closeVideo`) con `<video>`, subtítulos y tres beneficios; se abre con `#video` y se cierra con «Portafolios» o Esc.
 - **Visor** (`#viewer`): modo `libro` (animación 3D con `turn()`) o `galeria`; cajón de miniaturas; zoom (`#zoom`); pantalla completa.
 - **Estado**: `S` (libro, página, modo). La última página y el modo se recuerdan en `localStorage` (envuelto en `try/catch` vía `store`).
 - **Rutas**: `route()` lee el hash de la URL (`#video` abre la sección del video).
-- **Tema**: colores como variables CSS en `:root`, con modo oscuro por `prefers-color-scheme` y `data-theme`. Color de acento por libro: `--ind`, `--arq`, `--tec`.
+- **Tema**: colores como variables CSS en `:root`, con modo oscuro por `prefers-color-scheme` y `data-theme`. Color de acento por libro: `--ind`, `--arq`, `--tec`; el video usa `--imp` (`[data-book="video"]` y `.vview`).
 - Teclado: ← → / PageUp PageDown para hojear, Home/End, `Z` zoom, Esc cierra.
 
 ## Tareas comunes
@@ -53,7 +53,7 @@ Los archivos van numerados con dos dígitos: `p01.webp`, `p02.webp`, …
 3. Si cambia el número de páginas o dónde empieza cada proyecto, actualizar `pages` y `sections` en `BOOKS`.
 4. Si se añade un tipo de sección que no es proyecto, agregarlo a `PROJECT_SKIP`.
 
-**Añadir un libro nuevo**: nueva entrada en `BOOKS` (con id en minúsculas, sin guiones porque `-` separa la página en el hash), carpetas en `pages/` y `thumbs/`, un color de acento (`--xxx` en claro y oscuro + regla `[data-book="..."]`), y el enlace en `README.md`.
+**Añadir un libro nuevo**: nueva entrada en `BOOKS` (la repisa ya tiene 4 tarjetas: revisar `grid-template-columns` de `.shelf`) (con id en minúsculas, sin guiones porque `-` separa la página en el hash), carpetas en `pages/` y `thumbs/`, un color de acento (`--xxx` en claro y oscuro + regla `[data-book="..."]`), y el enlace en `README.md`.
 
 **Reemplazar el video** (p. ej. con narración grabada sobre `video/guion.md`): mantener el nombre `video/plataforma-4d-bim.mp4`, 1920×1080, H.264 (`-pix_fmt yuv420p -movflags +faststart`), AAC y < 25 MB. Para mezclar voz y música: `ffmpeg -i video.mp4 -i voz.wav -i video/musica-ambiente.m4a -filter_complex "[2:a]volume=0.35[m];[1:a][m]amix=inputs=2:duration=first[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 160k -movflags +faststart salida.mp4`. Si cambia la duración, actualizar los tiempos de `plataforma-4d-bim.vtt`.
 
