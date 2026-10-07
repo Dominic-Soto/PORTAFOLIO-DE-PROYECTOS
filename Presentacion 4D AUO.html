@@ -1,0 +1,1671 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulación 4D · Expansión de Oficinas AUO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root {
+  --ink: #15202b; --muted: #5a6774; --soft: #8994a0;
+  --card: rgba(255, 255, 255, 0.90); --card-solid: #ffffff; --line: rgba(21, 32, 43, 0.12);
+  --auo: #0f3f8d; --auo-2: #2f6fd0; --accent: #ef8a23; --demo: #d64541; --ok: #1d9a6c; --new: #2f86c9; --exist: #9aa4ad;
+  --shadow: 0 10px 30px rgba(15, 30, 45, 0.16);
+  --r: 14px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #dfe7ee; color: var(--ink);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+#c3d { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+/* ---------- loading ---------- */
+#loading { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
+  background: radial-gradient(1200px 700px at 30% 20%, #ffffff 0%, #e4ebf2 55%, #cfd9e3 100%); transition: opacity .6s ease; }
+#loading .box { text-align: center; max-width: 520px; padding: 24px; }
+#loading .t1 { font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--auo); font-weight: 700; }
+#loading .logos { display: flex; align-items: center; justify-content: center; gap: 22px; margin-bottom: 18px; }
+#loading .logos .vsep { width: 1px; height: 54px; background: rgba(21,32,43,.16); }
+#loading .lg-auo { width: 156px; height: 63px; } #loading .lg-auo img { width: 156px; height: 156px; top: -46px; }
+#loading .lg-pitsa { width: 72px; height: 66px; } #loading .lg-pitsa img { width: 104px; height: 92px; left: -18px; top: -12px; }
+#loading .t2 { font-size: 30px; font-weight: 800; margin: 10px 0 6px; letter-spacing: -.02em; }
+#loading .t3 { color: var(--muted); font-size: 15px; }
+#loading .bar { height: 4px; background: rgba(15, 63, 141, .12); border-radius: 4px; overflow: hidden; margin: 22px auto 10px; width: 260px; }
+#loading .bar i { display: block; height: 100%; width: 20%; background: var(--auo); border-radius: 4px; transition: width .4s ease; }
+#loading .msg { font-size: 13px; color: var(--muted); min-height: 18px; }
+#loading.hide { opacity: 0; pointer-events: none; }
+
+/* ---------- top bar ---------- */
+#top { position: fixed; left: 0; right: 0; top: 0; height: 58px; z-index: 20; display: flex; align-items: center; gap: 16px;
+  padding: 0 18px; background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.86)); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.brand .name { font-weight: 700; font-size: 15px; display: block; }
+.brand .sub { font-size: 12px; color: var(--muted); display: block; font-weight: 500; }
+.brand .vsep, .right .vsep { width: 1px; height: 30px; background: var(--line); flex: none; }
+/* logotipos: las imágenes traen margen blanco; se recortan al contenido (rutas en window.AUO_LOGOS) */
+.lg { position: relative; display: inline-block; overflow: hidden; flex: none; }
+.lg img { position: absolute; display: block; max-width: none; }
+.lg .lg-alt { position: absolute; inset: 0; display: none; place-items: center; font-weight: 800; font-size: 15px; letter-spacing: .02em; }
+.lg.noimg img { display: none; } .lg.noimg .lg-alt { display: grid; }
+.lg-auo { width: 104px; height: 42px; } .lg-auo img { width: 104px; height: 104px; left: 0; top: -31px; }
+.lg-auo .lg-alt { color: var(--auo); font-style: italic; font-size: 22px; }
+.lg-pitsa { width: 48px; height: 44px; } .lg-pitsa img { width: 69px; height: 61px; left: -12px; top: -8px; }
+.lg-pitsa .lg-alt { background: #15202b; color: #f7c600; border-radius: 7px; font-size: 11px; }
+.pitsa-txt { font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.2; }
+.pitsa-txt span { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+#chapters { display: flex; gap: 4px; margin: 0 auto; background: rgba(21,32,43,.05); padding: 4px; border-radius: 12px; }
+#chapters button { border: 0; background: transparent; padding: 8px 12px; border-radius: 9px; font-size: 13.5px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+#chapters button b { color: var(--soft); font-weight: 700; margin-right: 6px; }
+#chapters button:hover { color: var(--ink); background: rgba(255,255,255,.7); }
+#chapters button.on { background: #fff; color: var(--auo); box-shadow: 0 2px 8px rgba(15,30,45,.12); }
+#chapters button.on b { color: var(--accent); }
+.right { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.iconbtn { border: 1px solid var(--line); background: #fff; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-size: 15px; }
+.iconbtn:hover { border-color: var(--auo-2); color: var(--auo); }
+
+/* ---------- left panel ---------- */
+#panel { position: fixed; z-index: 15; left: 16px; top: 74px; width: 390px; max-height: calc(100vh - 190px); overflow: auto;
+  background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow);
+  padding: 20px 20px 16px; transition: transform .35s ease, opacity .35s ease; }
+#panel.collapsed { transform: translateX(-420px); opacity: 0; pointer-events: none; }
+#panel.withtl { max-height: calc(100vh - 262px); }   /* con línea de tiempo: no encimar la leyenda */
+#panel .kicker { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--accent); }
+#panel h2 { margin: 6px 0 10px; font-size: 24px; letter-spacing: -.02em; line-height: 1.15; }
+#panel p { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: #2a3642; }
+#panel h3 { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
+#panel ul { margin: 0 0 10px; padding-left: 18px; font-size: 13.5px; line-height: 1.55; color: #2a3642; }
+#panel li { margin: 2px 0; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 6px; }
+.fact { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 11px; }
+.fact .v { font-size: 18px; font-weight: 800; letter-spacing: -.02em; color: var(--auo); }
+.fact .l { font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+.note { font-size: 11.5px; color: var(--soft); line-height: 1.45; margin-top: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 999px; background: rgba(29,154,108,.12); color: var(--ok); }
+.pill.orange { background: rgba(239,138,35,.14); color: #b2610d; }
+.pill.blue { background: rgba(47,134,201,.13); color: #1c5f95; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: inline-block; }
+.photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+.photos button { border: 0; padding: 0; border-radius: 8px; overflow: hidden; aspect-ratio: 4/3; background: #cfd6dd; position: relative; }
+.photos img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
+.photos button:hover img { transform: scale(1.06); }
+.swatches { display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 6px; }
+.sw { display: flex; align-items: center; gap: 10px; font-size: 12.5px; line-height: 1.35; }
+.sw i { width: 26px; height: 18px; border-radius: 5px; border: 1px solid rgba(0,0,0,.12); flex: none; }
+.segmented { display: inline-flex; background: rgba(21,32,43,.06); padding: 3px; border-radius: 10px; gap: 2px; margin: 4px 0 8px; flex-wrap: wrap; }
+.segmented button { border: 0; background: transparent; padding: 6px 11px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.segmented button.on { background: #fff; color: var(--auo); box-shadow: 0 1px 5px rgba(15,30,45,.14); }
+
+/* gantt */
+.gantt { margin-top: 6px; }
+.grow { display: grid; grid-template-columns: 138px 1fr; gap: 8px; align-items: center; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
+.grow:hover { background: rgba(47,111,208,.07); }
+.grow .n { font-size: 11.5px; line-height: 1.25; color: #2a3642; }
+.grow .track { position: relative; height: 10px; background: rgba(21,32,43,.06); border-radius: 5px; }
+.grow .track i { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: #c7d0d9; }
+.grow .track i b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 5px; background: var(--accent); width: 0; }
+.grow.done .track i b { background: var(--ok); }
+.grow.active { background: rgba(239,138,35,.10); }
+.grow.active .n { font-weight: 700; color: #111; }
+.grow.ms .track i { background: transparent; }
+.grow .star { position: absolute; top: -5px; width: 20px; height: 20px; margin-left: -10px; color: var(--ok); font-size: 18px; line-height: 20px; text-align: center; }
+.grow.ms.sec .n { color: #1d3f73; font-weight: 700; }
+.grow.ms.sec .n span { font-weight: 500; }
+.grow.ms.sec .star { color: #1d3f73; font-size: 13px; }
+.grow.dim { opacity: .38; }
+.grow.dim.active { opacity: .7; }
+/* encabezados de fase del Gantt detallado */
+.ghead { display: grid; grid-template-columns: 138px 1fr; gap: 8px; align-items: center; padding: 8px 6px 5px; margin-top: 6px; border-top: 1px solid var(--line); cursor: pointer; user-select: none; }
+.ghead:first-child { margin-top: 0; border-top: 0; }
+.ghead .n { font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: #3b4855; line-height: 1.25; }
+.ghead .n small { display: block; font-size: 10.5px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--soft); margin-top: 2px; }
+.ghead .car { display: inline-block; width: 12px; color: var(--soft); transition: transform .2s ease; }
+.ghead.collapsed .car { transform: rotate(-90deg); }
+.ghead .track { position: relative; height: 6px; background: rgba(21,32,43,.05); border-radius: 4px; }
+.ghead .track i { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: rgba(21,32,43,.16); }
+.ghead .track i b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--accent); width: 0; }
+.ghead.done .track i b { background: var(--ok); }
+.ghead.active .n { color: var(--ink); }
+.ghead.active .n small { color: #b2610d; }
+.gbody.collapsed { display: none; }
+/* lista de sistemas (capítulo 3) */
+.sislist { margin: 4px 0 10px; }
+.sislist .g { font-size: 11.5px; font-weight: 700; color: var(--muted); margin: 10px 0 4px; letter-spacing: .02em; }
+.sislist .s { display: flex; gap: 9px; align-items: flex-start; padding: 4px 6px; border-radius: 8px; }
+.sislist .s[data-solo-sys] { cursor: pointer; }
+.sislist .s[data-solo-sys]:hover { background: rgba(47,111,208,.07); }
+.sislist .s i { width: 13px; height: 13px; border-radius: 3px; flex: none; margin-top: 3px; border: 1px solid rgba(0,0,0,.12); }
+.sislist .s b { display: block; font-size: 12.5px; font-weight: 700; color: #22303c; }
+.sislist .s span { display: block; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.sislist .s.nogeo { opacity: .55; }
+.cantBtn { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin: 16px 0 4px; padding: 11px 14px; border-radius: 12px; border: 1px solid rgba(15,63,141,.25); background: linear-gradient(180deg, #f3f7fe, #e8effb); cursor: pointer; font-family: inherit; color: var(--ink); }
+.cantBtn:hover { border-color: var(--auo-2); box-shadow: 0 4px 14px rgba(15,63,141,.14); }
+.cantBtn > b { flex: none; width: 34px; height: 34px; border-radius: 9px; background: var(--auo); color: #fff; display: grid; place-items: center; font-size: 18px; }
+.cantBtn span b { display: block; font-size: 13.5px; color: var(--auo); }
+.cantBtn span small { display: block; font-size: 11.5px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+.cantBtn.sm { margin: 10px 0 8px; padding: 8px 12px; }
+.cantBtn.sm > b { width: 28px; height: 28px; font-size: 15px; }
+.sp-hb { display: flex; gap: 6px; align-items: center; flex: none; }
+.sp-cant { border: 1px solid rgba(15,63,141,.3); background: #eef3fc; color: var(--auo); border-radius: 7px; font-size: 11.5px; font-weight: 700; padding: 4px 8px; white-space: nowrap; }
+.sp-cant:hover { background: var(--auo); color: #fff; }
+
+/* ---------- columna derecha: estado 4D + sistemas ---------- */
+#rcol { position: fixed; z-index: 15; right: 16px; top: 74px; width: 300px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; max-height: calc(100vh - 360px); }
+#rcol > * { pointer-events: auto; }
+#rcol > #status { flex: none; }
+#sysPanel { display: none; background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 12px 14px; overflow: auto; min-height: 0; flex: 1 1 auto; }
+#sysPanel.show { display: block; }
+#sysPanel.collapsed .sp-body { display: none; }
+.sp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sp-head b { font-size: 13.5px; }
+.sp-head span { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
+.sp-col { border: 1px solid var(--line); background: #fff; width: 26px; height: 26px; border-radius: 7px; font-size: 12px; transition: transform .2s ease; flex: none; }
+#sysPanel.collapsed .sp-col { transform: rotate(-90deg); }
+.sp-btns { display: flex; gap: 6px; margin: 10px 0 2px; }
+.sp-btns button, .sp-row .solo { border: 1px solid var(--line); background: #fff; border-radius: 7px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; color: #2a3642; }
+.sp-btns button:hover, .sp-row .solo:hover { border-color: var(--auo-2); color: var(--auo); }
+.sp-grp { margin-top: 9px; }
+.sp-gh { display: flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); cursor: pointer; margin-bottom: 2px; }
+.sp-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2px 0 2px 2px; }
+.sp-row label { display: flex; align-items: center; gap: 7px; font-size: 12.5px; line-height: 1.3; cursor: pointer; min-width: 0; color: #22303c; }
+.sp-row label i { width: 14px; height: 14px; border-radius: 4px; flex: none; border: 1px solid rgba(0,0,0,.14); }
+.sp-row.off label { color: var(--soft); }
+.sp-row.off label i { opacity: .3; }
+.sp-row .solo { padding: 2px 7px; font-size: 11px; flex: none; }
+.sp-row .solo.on { background: var(--auo); color: #fff; border-color: var(--auo); }
+#sysPanel input[type=checkbox], .sp-gh input { accent-color: var(--auo); margin: 0; width: 14px; height: 14px; flex: none; }
+
+/* ---------- status card (4D) ---------- */
+#status { background: var(--card); backdrop-filter: blur(12px);
+  border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); padding: 14px 16px; display: none; }
+#status .now .more { color: var(--muted); font-weight: 500; font-size: 11.5px; }
+#status .date { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+#status .wk { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.meter { margin: 8px 0; }
+.meter .row { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+.meter .bar { height: 8px; background: rgba(21,32,43,.08); border-radius: 5px; overflow: hidden; }
+.meter .bar i { display: block; height: 100%; width: 0; border-radius: 5px; background: var(--auo-2); transition: width .2s linear; }
+.meter.wc .bar i { background: var(--ok); }
+.op { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 10px; padding: 8px 10px; border-radius: 9px; background: rgba(29,154,108,.10); color: #137352; }
+.op .dot { animation: pulse 1.6s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(29,154,108,.55); } 70% { box-shadow: 0 0 0 8px rgba(29,154,108,0); } 100% { box-shadow: 0 0 0 0 rgba(29,154,108,0); } }
+#status .now { margin-top: 10px; font-size: 12px; color: var(--muted); }
+#status .now div { color: var(--ink); font-weight: 600; font-size: 12.5px; margin-top: 3px; line-height: 1.35; }
+#status .now div span { color: var(--accent); }
+
+/* ---------- views & toggles ---------- */
+#views { position: fixed; z-index: 15; right: 16px; bottom: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; transition: bottom .3s ease; }
+#views .group { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 560px; }
+.chip { border: 1px solid var(--line); background: var(--card); backdrop-filter: blur(10px); padding: 7px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #2a3642; box-shadow: 0 3px 10px rgba(15,30,45,.10); }
+.chip:hover { border-color: var(--auo-2); color: var(--auo); }
+.chip.on { background: var(--auo); color: #fff; border-color: var(--auo); }
+#legend { position: fixed; z-index: 14; left: 16px; bottom: 16px; max-width: calc(100vw - 640px); display: flex; gap: 6px 12px; flex-wrap: wrap; background: var(--card); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 12px; font-weight: 600; box-shadow: 0 3px 12px rgba(15,30,45,.10); transition: bottom .3s ease; }
+#legend span { display: inline-flex; align-items: center; gap: 6px; color: #2a3642; }
+#legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+#legend .lg-note { color: var(--muted); font-weight: 600; font-style: italic; }
+/* selector de disciplinas (barra de vistas) */
+#discBtns { justify-content: flex-end; }
+.discbar { display: flex; align-items: center; gap: 8px; background: var(--card); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 12px; padding: 3px 3px 3px 11px; box-shadow: 0 3px 10px rgba(15,30,45,.10); }
+.discbar .lbl { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.discbar .segmented { margin: 0; }
+
+/* ---------- timeline ---------- */
+#timeline { position: fixed; z-index: 16; left: 16px; right: 16px; bottom: 16px; height: 84px; background: var(--card); backdrop-filter: blur(12px);
+  border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); display: none; align-items: center; gap: 14px; padding: 10px 16px; }
+#timeline .ctrls { display: flex; align-items: center; gap: 8px; }
+#btnPlay { width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--auo); color: #fff; font-size: 18px; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(15,63,141,.35); }
+#btnPlay:hover { background: var(--auo-2); }
+#speed { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 12.5px; }
+#tl { position: relative; flex: 1; height: 58px; cursor: pointer; user-select: none; }
+#tl .months { position: absolute; left: 0; right: 0; top: 0; height: 16px; }
+#tl .months span { position: absolute; top: 0; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--muted); transform: translateX(3px); text-transform: uppercase; }
+#tl .months span::before { content: ''; position: absolute; left: -3px; top: 2px; width: 1px; height: 52px; background: rgba(21,32,43,.12); }
+#tl .bands { position: absolute; left: 0; right: 0; top: 20px; height: 26px; }
+#tl .bands i { position: absolute; height: 5px; border-radius: 3px; opacity: .95; }
+#tl .head { position: absolute; top: 12px; bottom: 0; width: 2px; background: var(--ink); margin-left: -1px; pointer-events: none; }
+#tl .head::after { content: ''; position: absolute; left: -5px; top: -5px; width: 12px; height: 12px; background: var(--ink); border-radius: 50%; border: 2px solid #fff; }
+#tl .ms { position: absolute; top: 14px; transform: translateX(-50%); color: var(--ok); font-size: 16px; line-height: 1; pointer-events: none; text-shadow: 0 1px 0 #fff; }
+#tl .mslabel { position: absolute; bottom: -2px; transform: translateX(-50%); font-size: 10.5px; font-weight: 700; color: var(--ok); white-space: nowrap; pointer-events: none; }
+#tl .ms2 { position: absolute; top: 16px; transform: translateX(-50%); color: #1d3f73; font-size: 11px; line-height: 1; text-shadow: 0 1px 0 #fff; }
+#tl .today { position: absolute; top: 16px; bottom: 6px; width: 0; border-left: 1px dashed var(--demo); pointer-events: none; }
+.tl-date { min-width: 128px; text-align: right; }
+.tl-date b { display: block; font-size: 18px; letter-spacing: -.01em; }
+.tl-date span { font-size: 11.5px; color: var(--muted); }
+
+/* ---------- banner ---------- */
+#banner { position: fixed; z-index: 30; left: 50%; top: 86px; transform: translate(-50%, -20px); opacity: 0; pointer-events: none; transition: all .45s ease;
+  background: #0e5c43; color: #fff; border-radius: 16px; padding: 14px 22px; box-shadow: 0 14px 40px rgba(10,60,40,.35); display: flex; gap: 14px; align-items: center; max-width: 720px; }
+#banner.show { opacity: 1; transform: translate(-50%, 0); }
+#banner.sec { background: #1d3f73; box-shadow: 0 14px 40px rgba(15,40,80,.35); }
+#banner.sec .ic { font-size: 22px; }
+#banner .ic { font-size: 30px; }
+#banner b { display: block; font-size: 17px; }
+#banner span { font-size: 13px; opacity: .9; }
+
+/* ---------- lightbox & video ---------- */
+#lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(8,14,20,.86); display: none; align-items: center; justify-content: center; padding: 40px; }
+#lightbox.show { display: flex; }
+#lightbox figure { margin: 0; max-width: min(1200px, 92vw); text-align: center; }
+#lightbox img { max-width: 100%; max-height: 78vh; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+#lightbox figcaption { color: #e9eef3; margin-top: 12px; font-size: 14.5px; }
+#lightbox figcaption span { color: #9fb0c0; font-size: 12.5px; display: block; margin-top: 4px; }
+#lightbox .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; font-size: 22px; }
+#lightbox .prev { left: 20px; } #lightbox .next { right: 20px; }
+#lightbox .close { position: absolute; right: 20px; top: 20px; width: 42px; height: 42px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; font-size: 20px; }
+#videoWrap { position: fixed; inset: 58px 0 0 0; z-index: 18; background: rgba(9,16,24,.92); display: none; align-items: center; justify-content: center; padding: 30px; }
+#videoWrap.show { display: flex; }
+#videoWrap .inner { width: min(1280px, 94vw); }
+#videoWrap video { width: 100%; border-radius: 12px; background: #000; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+#videoWrap .cap { color: #cfd9e3; font-size: 13.5px; margin-top: 12px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+#videoWrap a { color: #9cc3ff; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1560px) { .pitsa-txt, .right .vsep { display: none; } }
+@media (max-width: 1420px) { .brand .sub { display: none; } #chapters button { padding: 8px 10px; } }
+@media (max-width: 1300px) { #chapters button:not(.on) span { display: none; } }
+@media (max-width: 1100px) { #chapters button span { display: none; } .brand .name { display: none; } }
+@media (max-width: 820px) {
+  #top { height: auto; flex-wrap: wrap; padding: 8px 12px; gap: 8px; }
+  #chapters { order: 3; width: 100%; overflow-x: auto; margin: 0; }
+  #panel { left: 8px; right: 8px; width: auto; top: auto; bottom: 8px; max-height: 42vh; }
+  #status { display: none !important; }
+  #rcol { left: 8px; right: 8px; width: auto; top: 120px; }
+  #sysPanel { max-height: 30vh !important; }
+  #views { bottom: calc(42vh + 18px); right: 8px; }
+  #legend { display: none; }
+  #timeline { left: 8px; right: 8px; }
+}
+</style>
+</head>
+<body>
+<canvas id="c3d" tabindex="0" aria-label="Modelo 3D de las oficinas AUO"></canvas>
+
+<div id="loading"><div class="box">
+  <div class="logos"><span class="lg lg-auo"><img data-logo="auo" alt=""><span class="lg-alt">AUO</span></span><span class="vsep"></span><span class="lg lg-pitsa"><img data-logo="pitsa" alt=""><span class="lg-alt">PITSA</span></span></div>
+  <div class="t1">AUO · PITSA Industriales</div>
+  <div class="t2">Expansión de Oficinas AUO</div>
+  <div class="t3">Simulación 4D · estructura e instalaciones · modelo del 01-10-26</div>
+  <div class="bar"><i id="loadBar"></i></div>
+  <div class="msg" id="loadMsg">Cargando modelo 3D…</div>
+</div></div>
+
+<header id="top">
+  <div class="brand"><span class="lg lg-auo" role="img" aria-label="AUO"><img data-logo="auo" alt=""><span class="lg-alt">AUO</span></span><span class="vsep"></span><span><span class="name">Expansión de Oficinas</span><span class="sub">Simulación 4D · Ejes A–E / 1–3 · Modelo 01-10-26</span></span></div>
+  <nav id="chapters" aria-label="Capítulos">
+    <button data-ch="actual"><b>1</b><span>Estado actual</span></button>
+    <button data-ch="alcance"><b>2</b><span>Alcance</span></button>
+    <button data-ch="instal"><b>3</b><span>Estructura e instalaciones</span></button>
+    <button data-ch="proceso"><b>4</b><span>Proceso 4D</span></button>
+    <button data-ch="resultado"><b>5</b><span>Resultado final</span></button>
+    <button data-ch="video"><b>6</b><span>Video</span></button>
+  </nav>
+  <div class="right"><span class="pitsa-txt">PITSA Industriales<span>Constructor</span></span><span class="lg lg-pitsa" role="img" aria-label="PITSA Industriales"><img data-logo="pitsa" alt=""><span class="lg-alt">PITSA</span></span><span class="vsep"></span>
+    <button class="iconbtn" id="btnPanel" title="Mostrar u ocultar el panel">☰</button>
+    <button class="iconbtn" id="btnFull" title="Pantalla completa">⛶</button></div>
+</header>
+<script>
+  // Logotipos: rutas en un solo lugar (en la entrega se reescriben, p. ej. 'recursos/logo_auo.jpg').
+  window.AUO_LOGOS = window.AUO_LOGOS || { auo: 'recursos/logos/logo_auo.jpg', pitsa: 'recursos/logos/logo_pitsa.jpg' };
+  document.querySelectorAll('img[data-logo]').forEach(function (im) {
+    var box = im.parentNode;
+    im.onerror = function () { box.classList.add('noimg'); };
+    im.src = window.AUO_LOGOS[im.getAttribute('data-logo')] || '';
+  });
+</script>
+
+<aside id="panel" aria-live="polite"></aside>
+
+<div id="rcol">
+<div id="status">
+  <div class="date" id="stDate">—</div>
+  <div class="wk" id="stWeek">—</div>
+  <div class="meter"><div class="row"><span>Avance de la ampliación</span><span id="stTot">0%</span></div><div class="bar"><i id="stTotBar"></i></div></div>
+  <div class="meter wc"><div class="row"><span>Sanitarios PB · meta <span id="stMsDate"></span></span><span id="stWc">0%</span></div><div class="bar"><i id="stWcBar"></i></div></div>
+  <div class="op"><span class="dot"></span><span>Oficinas existentes (ejes E–N) en operación</span></div>
+  <div class="now">En ejecución<div id="stNow">—</div></div>
+</div>
+<div id="sysPanel" aria-label="Sistemas de instalaciones"></div>
+</div>
+
+<div id="views"><div class="group" id="discBtns"></div><div class="group" id="viewBtns"></div><div class="group" id="toggleBtns"></div></div>
+<div id="legend"></div>
+
+<footer id="timeline">
+  <div class="ctrls">
+    <button id="btnPlay" title="Reproducir / pausar (barra espaciadora)">▶</button>
+    <select id="speed" title="Velocidad"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+  </div>
+  <div id="tl"><div class="months"></div><div class="bands"></div><div class="today"></div><div class="ms">★</div><div class="mslabel"></div><div class="head"></div></div>
+  <div class="tl-date"><b id="tlDate">—</b><span id="tlTask">Estado actual</span></div>
+</footer>
+
+<div id="banner"><div class="ic">✓</div><div><b id="bnTitle"></b><span id="bnText"></span></div></div>
+
+<div id="lightbox" role="dialog" aria-modal="true">
+  <button class="close" aria-label="Cerrar">✕</button>
+  <button class="nav prev" aria-label="Anterior">‹</button>
+  <figure><img alt=""><figcaption></figcaption></figure>
+  <button class="nav next" aria-label="Siguiente">›</button>
+</div>
+
+<div id="videoWrap"><div class="inner">
+  <video id="video" controls preload="metadata" playsinline></video>
+  <div class="cap"><span id="videoCap"></span><a id="videoLink" href="#" download>Descargar video</a></div>
+</div></div>
+
+<script src="recursos/programa.js"></script>
+<script src="recursos/fotos/fotos.js"></script>
+<script src="recursos/data/modelo.js"></script>
+<script src="recursos/data/cantidades.js"></script>
+<script src="recursos/cantidades_ui.js"></script>
+<script src="recursos/data/elementos.js"></script>
+<script src="recursos/herramientas.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+// Simulación 4D · Expansión de Oficinas AUO (ejes A–E / 1–3)
+// Visor 3D + línea de tiempo. Modelo coordinado «AUO.01-10-26.Expansión Oficinas.dwfx» (arquitectura, estructura e
+// instalaciones), convertido a data/modelo.js por nw/Pack.cs.
+//
+// Parámetros de URL:
+//   ?cap=actual|alcance|instal|proceso|resultado|video  capítulo inicial
+//   ?disc=todo|arq|est|mep                               filtro de disciplinas inicial
+//   ?demo_sistemas=1                                     DEPURACIÓN: disciplinas y sistemas ficticios (ver applyDemoSistemas)
+//   ?grabar=1                                            generador del video (grabar.js)
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+window.__AUO_APP = true;
+const $ = (s, r = document) => r.querySelector(s);
+const QS = new URLSearchParams(location.search);
+const PROG = window.AUO_PROGRAMA;
+const FOTOS = window.AUO_FOTOS || [];
+const META = window.AUO_MODEL_META;
+const DAY = 86400000;
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const MESES_L = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const toT = (s) => new Date(s + 'T12:00:00').getTime();
+const fmt = (t) => { const d = new Date(t); return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`; };
+const fmtL = (t) => { const d = new Date(t); return `${d.getDate()} de ${MESES_L[d.getMonth()]} de ${d.getFullYear()}`; };
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const easeIO = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const hexRGB = (h) => { const s = String(h).replace('#', ''); const n = parseInt(s.length === 3 ? s.split('').map(c => c + c).join('') : s, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+
+// ---------------------------------------------------------------- sistemas de instalaciones (contrato del modelo)
+// Tabla de referencia: se usa sólo si el modelo no trae META.sistemas o trae un sistema que no está en su lista.
+const DEFAULT_SISTEMAS = [
+  { id: 'AF', nombre: 'Agua fría', color: '#2b7bd6', grupo: 'Hidráulica y sanitaria' },
+  { id: 'AC', nombre: 'Agua caliente', color: '#f08c00', grupo: 'Hidráulica y sanitaria' },
+  { id: 'SAN', nombre: 'Drenaje sanitario', color: '#8d5b3b', grupo: 'Hidráulica y sanitaria' },
+  { id: 'VEN', nombre: 'Ventilación sanitaria', color: '#b59a6d', grupo: 'Hidráulica y sanitaria' },
+  { id: 'PLU', nombre: 'Drenaje pluvial', color: '#16a3a3', grupo: 'Hidráulica y sanitaria' },
+  { id: 'PCI', nombre: 'Protección contra incendio', color: '#d62828', grupo: 'Protección contra incendio' },
+  { id: 'HVR', nombre: 'HVAC · tubería de refrigerante VRF', color: '#7b4fc9', grupo: 'Aire acondicionado' },
+  { id: 'HVC', nombre: 'HVAC · condensados', color: '#68b6e8', grupo: 'Aire acondicionado' },
+  { id: 'HVD', nombre: 'HVAC · ductos y difusores', color: '#5aa9a0', grupo: 'Aire acondicionado' },
+  { id: 'HVE', nombre: 'HVAC · equipos', color: '#4b5d7a', grupo: 'Aire acondicionado' },
+  { id: 'ELE', nombre: 'Eléctrica · canalizaciones, charolas y tableros', color: '#e0a800', grupo: 'Eléctrica y especiales' },
+  { id: 'CON', nombre: 'Contactos', color: '#c77d00', grupo: 'Eléctrica y especiales' },
+  { id: 'ILU', nombre: 'Alumbrado', color: '#f2d34b', grupo: 'Eléctrica y especiales' },
+  { id: 'VYD', nombre: 'Voz y datos', color: '#2e9e5b', grupo: 'Eléctrica y especiales' },
+  { id: 'SEG', nombre: 'Seguridad electrónica (CCTV y control de acceso)', color: '#6c757d', grupo: 'Eléctrica y especiales' }
+];
+const DESC_SIS = {
+  AF: 'Red de agua fría (A.F.) a muebles sanitarios y servicios de planta baja y planta alta.',
+  AC: 'Red de agua caliente (A.C.) a lavabos y servicios.',
+  SAN: 'Descargas de muebles sanitarios y ramales de drenaje hacia la red exterior.',
+  VEN: 'Tubería de ventilación de la red sanitaria.',
+  PLU: 'Bajadas y conducción del agua pluvial de la cubierta.',
+  PCI: 'Red húmeda con rociadores (SCI · oficinas); integra tramos existentes y nuevos.',
+  HVR: 'Tubería de refrigerante (gas y líquido) de los sistemas VRF-1 y VRF-2.',
+  HVC: 'Red de condensados de las unidades interiores.',
+  HVD: 'Ductos de inyección, extracción, retorno y aire exterior (ERV) con difusores y rejillas.',
+  HVE: 'Unidades interiores y condensadoras VRF y equipos de ventilación (ERV).',
+  ELE: 'Tubería conduit, charolas portacables y tableros eléctricos.',
+  CON: 'Contactos y salidas de fuerza.',
+  ILU: 'Luminarias y dispositivos de control de alumbrado.',
+  VYD: 'Salidas de voz y datos.',
+  SEG: 'Cámaras de CCTV y control de acceso.'
+};
+const DISC_IDS = ['ARQ', 'EST', 'MEP'];
+
+// ---------------------------------------------------------------- DEPURACIÓN: ?demo_sistemas=1
+// Asigna disciplinas y sistemas FICTICIOS a un modelo que no trae los campos disc/sys (p. ej. data/modelo_anterior.js
+// copiado como data/modelo.js) para probar el filtro de disciplinas y el panel de sistemas sin el modelo del 01-10-26:
+//   T03/T04/T05/T08 → EST · T06 → ARQ/AF/SAN/VEN · T10 → 15 sistemas · resto → ARQ.
+// Los batches de T06/T10 se reparten por rangos de triángulos de cada fragmento (mismo búfer de vértices) y las partes
+// MEP se recolorean con el color de su sistema. No hace nada si el modelo ya trae 'disc'. No usar en la entrega.
+function applyDemoSistemas(meta) {
+  if (!meta || meta.batches.some(b => b.disc)) return false;
+  if (!Array.isArray(meta.sistemas) || !meta.sistemas.length) meta.sistemas = DEFAULT_SISTEMAS.map(s => ({ ...s }));
+  const col = Object.fromEntries(meta.sistemas.map(s => [s.id, s.color]));
+  const SPLIT = { T06: [null, 'AF', 'SAN', 'VEN'], T10: ['AF', 'AC', 'SAN', 'VEN', 'PLU', 'PCI', 'HVR', 'HVC', 'HVD', 'HVE', 'ELE', 'CON', 'ILU', 'VYD', 'SEG'] };
+  const out = [];
+  for (const b of meta.batches) {
+    if (['T03', 'T04', 'T05', 'T08'].includes(b.task)) { out.push({ ...b, disc: 'EST', sys: null }); continue; }
+    const parts = !b.glass && SPLIT[b.task];
+    if (!parts) { out.push({ ...b, disc: 'ARQ', sys: null }); continue; }
+    parts.forEach((sys, k) => {
+      const chunks = b.chunks.map(c => {
+        const T = c.ni / 3, a = Math.floor(T * k / parts.length), z = Math.floor(T * (k + 1) / parts.length);
+        return { ...c, io: c.io + a * 6, ni: (z - a) * 3 };
+      }).filter(c => c.ni > 0);
+      out.push({ ...b, disc: sys ? 'MEP' : 'ARQ', sys, _demoColor: sys ? col[sys] : null, tris: chunks.reduce((s, c) => s + c.ni / 3, 0), chunks });
+    });
+  }
+  meta.batches = out; meta._demo = true;
+  return true;
+}
+if (QS.has('demo_sistemas') && QS.get('demo_sistemas') !== '0') applyDemoSistemas(META);
+
+// ---------------------------------------------------------------- building frame
+// u = a lo largo del edificio (eje M = 0 … eje A = 96.95 m), v = a lo ancho (eje 3 = 0.50 … eje 1 = 14.20 m), z = altura.
+const UC = META.uc, VC = META.vc;
+const P = (u, z, v) => new THREE.Vector3(u - UC, z, v - VC);
+const GRID = { A: 96.95, B: 83.70, C: 75.80, D: 67.90, E: 60.40, F: 52.90, G: 45.40, H: 37.90, I: 30.40, J: 22.90, K: 15.40, L: 7.90, M: 0.0, N: -6.90 };
+const AX = { '1': 14.20, '2': 7.45, '3': 0.50 };
+const WC_ZONES = [[65.1, 78.2, 0.3, 10.4], [60.5, 63.3, 4.9, 7.6]];
+const NEW_COLS = [[60.40, 7.45, 0], [60.40, 0.50, 0], [70.39, 0.50, 0], [75.39, 0.50, 0], [60.40, 9.70, 0], [97.20, 14.18, 0], [69.17, 9.70, 0], [74.30, 9.71, 0], [78.15, 9.71, 0], [83.32, 9.71, 0], [88.69, 9.71, 0], [83.32, 5.14, 0], [91.90, 9.71, 0], [91.90, 5.14, 0], [97.20, 9.71, 0], [63.65, 9.70, 0], [61.10, 14.18, 0], [61.10, 9.70, 0], [61.10, 2.20, 0], [61.10, 5.14, 0], [88.69, 5.14, 0], [63.65, 14.18, 1], [69.17, 14.18, 1], [74.30, 14.18, 1], [78.15, 14.18, 1], [83.32, 14.18, 1], [88.69, 14.18, 1], [91.90, 14.18, 1], [88.69, 1.20, 1], [97.20, 5.14, 1], [91.90, 1.20, 1], [97.20, 1.20, 1], [69.17, 2.20, 1], [71.70, 2.20, 1], [74.30, 2.20, 1], [83.32, 2.20, 1]];
+
+// ---------------------------------------------------------------- program / tasks
+// Funciona con el programa de 14 tareas (T01…T14) y con el detallado (~60 tareas con edt, fase, nivel y sistemas):
+// las tareas "clave" (sanitarios PB, demolición del ala, tapial, cimentación) se identifican por grupo/nombre y, si no,
+// por los identificadores del programa original.
+const T_START = toT(PROG.inicio), T_END = toT(PROG.fin);
+const TASKS = (PROG.tareas || []).filter(t => t && t.id && t.inicio && t.fin && t.tipo !== 'R' && t.tipo !== 'H')
+  .map((t, i) => ({ ...t, i, t0: toT(t.inicio), t1: toT(t.fin) + DAY * 0.999 }));
+const TASK = Object.fromEntries(TASKS.map(t => [t.id, t]));
+const HITO = PROG.hito || { id: 'M1', fecha: PROG.fin, titulo: 'Hito', detalle: '' };
+const MS = { ...HITO, t: toT(HITO.fecha) };
+const MS_D = new Date(MS.t), MS_LBL = `${MESES[MS_D.getMonth()]} ${MS_D.getFullYear()}`;   // p. ej. "ene 2027"
+const TOTAL_DUR = TASKS.reduce((s, t) => s + (t.t1 - t.t0), 0) || 1;
+const WORK_T0 = TASKS.length ? Math.min(...TASKS.map(k => k.t0)) : T_START;   // inicio de obra
+const WORK_T1 = TASKS.length ? Math.max(...TASKS.map(k => k.t1)) : T_END;     // fin de obra
+const FIRST_TASK = TASKS.find(k => k.t0 === WORK_T0) || null;
+const LAST_TASK = TASKS.find(k => k.t1 === WORK_T1) || null;
+const txt = (k) => `${k.grupo || ''} ${k.nombre || ''}`;
+
+// sanitarios de planta baja (hito del cliente)
+let WC_TASKS = TASKS.filter(k => /sanitarios\s*pb/i.test(k.grupo || ''));
+if (!WC_TASKS.length) WC_TASKS = TASKS.filter(k => k.id === 'T06' || k.id === 'T07');
+if (!WC_TASKS.length) WC_TASKS = TASKS.filter(k => /sanitarios?\s*(de\s*)?(pb|planta baja)/i.test(txt(k)));
+{ const pre = WC_TASKS.filter(k => k.t1 <= MS.t + DAY); if (pre.length) WC_TASKS = pre; }
+const WC_IDS = new Set(WC_TASKS.map(k => k.id));
+const WC_T0 = WC_TASKS.length ? Math.min(...WC_TASKS.map(k => k.t0)) : MS.t;
+const WC_LAST = WC_TASKS.reduce((a, b) => (!a || b.t1 >= a.t1 ? b : a), null);
+
+// colores de grupo: programa (PROG.grupos) > tabla base > paleta para grupos nuevos
+const GROUP_COLORS = { 'Preliminares': '#8d99a6', 'Demolición': '#d64541', 'Cimentación': '#6b7c93', 'Estructura': '#4f78a8', 'Sanitarios PB': '#1d9a6c', 'Envolvente': '#7a62b8', 'Instalaciones': '#2aa3b8', 'Interiores': '#ef8a23', 'Acabados finales': '#c9a227', 'Pruebas': '#5a6774', 'Entrega': '#15202b' };
+if (Array.isArray(PROG.grupos)) for (const g of PROG.grupos) if (g && g.nombre && g.color) GROUP_COLORS[g.nombre] = String(g.color).startsWith('#') ? g.color : '#' + g.color;
+{
+  const EXTRA = ['#2b7bd6', '#7b4fc9', '#d97a2b', '#16a3a3', '#c2477d', '#5b8c3a', '#b88a1b', '#3f6fa6', '#8d5b3b', '#6c757d'];
+  let xi = 0; for (const k of TASKS) if (k.grupo && !GROUP_COLORS[k.grupo]) GROUP_COLORS[k.grupo] = EXTRA[xi++ % EXTRA.length];
+}
+const gcol = (k) => GROUP_COLORS[k.grupo] || '#8994a0';
+
+// dirección de revelado de los elementos de cada tarea ('y' = de abajo hacia arriba, 'x' = a lo largo del edificio):
+// campo opcional 'revelado' de la tarea > tabla del programa original de 14 tareas > palabras clave del nombre
+const LEGACY = TASKS.length <= 16 && !TASKS.some(k => k.edt || k.fase);
+const REVEAL0 = { T03: 'y', T04: 'y', T05: 'x', T06: 'y', T07: 'y', T08: 'x', T09: 'y', T10: 'y', T11: 'y', T12: 'y', T13: 'x' };
+function revealOf(id) {
+  const k = TASK[id];
+  if (k && (k.revelado === 'x' || k.revelado === 'y')) return k.revelado;
+  if (LEGACY && REVEAL0[id]) return REVEAL0[id];
+  if (k && /losa|vigas|montenes|cubierta|l[aá]mina|plaf[oó]n|pisos?\b|mobiliario|ductos|tuber[ií]a|canalizaciones|charolas|ramales|redes|rociadores|refrigerante/i.test(k.nombre || '')) return 'x';
+  return 'y';
+}
+// hitos: el del cliente (PROG.hito) más los del programa detallado (PROG.hitos)
+const edtCmp = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (x[i] ?? -1) - (y[i] ?? -1); if (d) return d; } return 0; };
+const HITOS = (() => {
+  const list = (Array.isArray(PROG.hitos) ? PROG.hitos : []).filter(h => h && h.fecha).map(h => ({ ...h, t: toT(h.fecha), main: h.id === MS.id }));
+  if (!list.some(h => h.main)) list.push({ ...MS, main: true });
+  for (const h of list) {
+    // renglón del Gantt tras el que se muestra el hito
+    let after = null;
+    if (h.edt) after = TASKS.filter(k => k.edt && edtCmp(k.edt, h.edt) < 0).sort((a, b) => edtCmp(a.edt, b.edt)).pop() || null;
+    if (!after && h.main) after = WC_LAST;
+    if (!after) after = TASKS.filter(k => k.t1 <= h.t + DAY).pop() || null;
+    h.after = after ? after.id : null;
+  }
+  return list.sort((a, b) => a.t - b.t);
+})();
+const taskP = (task, t) => task ? clamp((t - task.t0) / (task.t1 - task.t0), 0, 1) : 1;
+
+// ---------------------------------------------------------------- renderer / scene
+const canvas = $('#c3d');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.localClippingEnabled = true;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+{
+  const c = document.createElement('canvas'); c.width = 16; c.height = 512;
+  const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, 0, 512);
+  gr.addColorStop(0, '#9fc2e3'); gr.addColorStop(0.55, '#dfe9f1'); gr.addColorStop(1, '#eef1ea');
+  g.fillStyle = gr; g.fillRect(0, 0, 16, 512);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; scene.background = tex;
+}
+scene.fog = new THREE.Fog(0xe6ecef, 260, 620);
+const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.3, 1500);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 4; controls.maxDistance = 420;
+controls.screenSpacePanning = true;
+
+const hemi = new THREE.HemisphereLight(0xf4f7ff, 0x8b8a80, 1.55); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff4e2, 2.35);
+sun.position.copy(P(10, 70, 60)); sun.target.position.copy(P(48, 0, 7)); scene.add(sun, sun.target);
+sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, { left: -80, right: 80, top: 45, bottom: -45, near: 10, far: 220 });
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
+const fill = new THREE.DirectionalLight(0xdbe7ff, 0.55); fill.position.copy(P(120, 30, -40)); scene.add(fill);
+
+// global cut plane (vista en corte por nivel)
+const cutPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1000);
+let cutTarget = 1000, cutCurrent = 1000;
+
+// ---------------------------------------------------------------- materials
+const UNIFORM_DECL = 'uniform vec3 uTint; uniform float uTintAmt; uniform vec3 uBase; uniform float uBaseAmt;\n';
+function patchMaterial(m) {
+  m.userData.u = { uTint: { value: new THREE.Color('#ef8a23') }, uTintAmt: { value: 0 }, uBase: { value: new THREE.Color('#d9dde1') }, uBaseAmt: { value: 0 } };
+  m.onBeforeCompile = (s) => {
+    Object.assign(s.uniforms, m.userData.u);
+    s.vertexShader = s.vertexShader.replace('#include <color_vertex>', '#include <color_vertex>\n#ifdef USE_COLOR\n vColor = pow(max(vColor, vec3(0.0)), vec3(2.2));\n#endif');
+    s.fragmentShader = UNIFORM_DECL + s.fragmentShader
+      .replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb = mix(diffuseColor.rgb, uBase, uBaseAmt);\n diffuseColor.rgb = mix(diffuseColor.rgb, uTint, uTintAmt);')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance += uTint * uTintAmt * 0.28;');
+  };
+  m.customProgramCacheKey = () => 'auo-' + (m.vertexColors ? 'vc' : 'nc');
+  return m;
+}
+function modelMaterial(glass) {
+  return patchMaterial(new THREE.MeshStandardMaterial({
+    vertexColors: true, flatShading: true, side: THREE.DoubleSide,
+    roughness: glass ? 0.12 : 0.86, metalness: glass ? 0.05 : 0.0,
+    transparent: glass, opacity: glass ? 0.34 : 1, depthWrite: !glass
+  }));
+}
+function plainMaterial(color, opts = {}) {
+  return patchMaterial(new THREE.MeshStandardMaterial({ color, flatShading: true, side: THREE.DoubleSide, roughness: 0.85, metalness: 0, ...opts }));
+}
+
+// ---------------------------------------------------------------- 4D items registry
+// item: { status:'E'|'N'|'D'|'T' (temporal), task, meshes[], mats[], bounds(Box3), reveal:'x'|'y'|null, glass, gen,
+//         disc:'ARQ'|'EST'|'MEP'|'GEN' (geometría generada de contexto)|'TMP' (obra temporal), sys:id de sistema|null }
+const ITEMS = [];
+function register(item) {
+  item.plane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e6);
+  item.disc = item.disc || 'ARQ';
+  for (const m of item.mats) {
+    m.clippingPlanes = [cutPlane, item.plane];
+    m.userData.baseOpacity = m.opacity; m.userData.baseTransparent = m.transparent; m.userData.baseDepthWrite = m.depthWrite;
+  }
+  for (const ms of item.meshes) { ms.userData.cast0 = ms.castShadow; ms.userData.item = item; }
+  ITEMS.push(item); return item;
+}
+
+// ---------------------------------------------------------------- loading UI
+const setLoad = (pct, msg) => { $('#loadBar').style.width = pct + '%'; if (msg) $('#loadMsg').textContent = msg; };
+
+async function decodeModel() {
+  setLoad(30, 'Descomprimiendo modelo 3D…');
+  const bin = Uint8Array.from(atob(window.AUO_MODEL_DATA), c => c.charCodeAt(0));
+  const buf = await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  return buf;
+}
+
+function buildModel(buf) {
+  const root = new THREE.Group(); root.name = 'modelo'; scene.add(root);
+  for (const b of META.batches) {
+    const disc = DISC_IDS.includes(b.disc) ? b.disc : 'ARQ';
+    const sys = disc === 'MEP' ? (b.sys || '_') : null;
+    const mat = modelMaterial(b.glass);
+    const task = !b.task || b.task === 'E' ? null : b.task;
+    const item = { status: b.status, task, meshes: [], mats: [mat], bounds: new THREE.Box3(), reveal: revealOf(b.task), glass: b.glass, disc, sys };
+    const demoRGB = b._demoColor ? hexRGB(b._demoColor) : null;
+    for (const c of b.chunks) {
+      if (!c.ni || !c.nv) continue;
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Int16Array(buf, c.po, c.nv * 3), 3));
+      let col = new Uint8Array(buf, c.co, c.nv * 3);
+      if (demoRGB) { col = new Uint8Array(c.nv * 3); for (let i = 0; i < col.length; i += 3) { col[i] = demoRGB[0]; col[i + 1] = demoRGB[1]; col[i + 2] = demoRGB[2]; } }
+      g.setAttribute('color', new THREE.BufferAttribute(col, 3, true));
+      g.setIndex(new THREE.BufferAttribute(new Uint16Array(buf, c.io, c.ni), 1));
+      const mesh = new THREE.Mesh(g, mat);
+      mesh.scale.setScalar(META.q);
+      mesh.castShadow = !b.glass; mesh.receiveShadow = !b.glass;
+      mesh.userData.batch = b; mesh.userData.item = item;
+      // tramos de triángulos por elemento [índice en elementos.js, triángulos, …] para seleccionar y medir (herramientas.js)
+      if (c.nr) mesh.userData.runs = new Uint32Array(buf, c.ro, c.nr * 2);
+      root.add(mesh); item.meshes.push(mesh);
+      item.bounds.union(new THREE.Box3(new THREE.Vector3(...c.min).multiplyScalar(META.q), new THREE.Vector3(...c.max).multiplyScalar(META.q)));
+    }
+    if (item.meshes.length) register(item);
+  }
+}
+
+// sistemas: SIS_ALL = lista del modelo (META.sistemas) + sistemas usados que no estén listados; SISTEMAS = sólo los que tienen geometría
+let SIS_ALL = [], SISTEMAS = [];
+const SIS = {};
+const HAS = { est: false, mep: false };
+function buildSistemas() {
+  const used = new Set(ITEMS.filter(i => i.disc === 'MEP').map(i => i.sys));
+  const listed = Array.isArray(META.sistemas) ? META.sistemas.filter(s => s && s.id) : [];
+  SIS_ALL = listed.map(s => ({ ...s, color: s.color || '#7d8a96', grupo: s.grupo || 'Instalaciones' }));
+  for (const id of used) if (!SIS_ALL.some(s => s.id === id)) {
+    const d = DEFAULT_SISTEMAS.find(s => s.id === id);
+    SIS_ALL.push(d ? { ...d } : { id, nombre: id === '_' ? 'Otras instalaciones' : id, color: '#7d8a96', grupo: 'Otras instalaciones' });
+  }
+  SIS_ALL.forEach(s => { SIS[s.id] = s; });
+  SISTEMAS = SIS_ALL.filter(s => used.has(s.id));
+  HAS.mep = SISTEMAS.length > 0;
+  HAS.est = ITEMS.some(i => i.disc === 'EST' && !i.gen);
+}
+// disciplinas presentes en cada tarea (para atenuar renglones del Gantt y orientar la cámara automática)
+const TASK_DISC = {};
+function buildTaskDisc() {
+  for (const it of ITEMS) if (it.task) (TASK_DISC[it.task] ||= new Set()).add(it.disc);
+  for (const k of TASKS) if (Array.isArray(k.sistemas) && k.sistemas.length) (TASK_DISC[k.id] ||= new Set()).add('MEP');
+}
+const taskHasDisc = (id, d) => { const s = TASK_DISC[id]; if (!s) return false; return d === 'mep' ? s.has('MEP') : d === 'est' ? s.has('EST') : true; };
+
+// ---------------------------------------------------------------- generated geometry
+function boxMesh(u0, u1, z0, z1, v0, v1, mat) {
+  const g = new THREE.BoxGeometry(u1 - u0, z1 - z0, v1 - v0);
+  const m = new THREE.Mesh(g, mat);
+  m.position.copy(P((u0 + u1) / 2, (z0 + z1) / 2, (v0 + v1) / 2));
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+function genItem(status, task, meshes, mats, reveal = 'y', disc = 'GEN') {
+  const g = new THREE.Group(); meshes.forEach(m => g.add(m)); scene.add(g);
+  const bounds = new THREE.Box3().setFromObject(g);
+  return register({ status, task, meshes, mats, bounds, reveal, gen: true, group: g, disc });
+}
+// tareas del programa a las que se ligan los elementos generados
+// (se excluyen el retiro de instalaciones, el del tapial y las tareas de limpieza/entrega)
+const DEMO_CANDS = TASKS.filter(k => /demol|desmantel|desmont|retiro/i.test(txt(k)) && !/tapial|limpieza|entrega|pruebas|instalaci/i.test(k.nombre || ''));
+const DEMO_MAIN = DEMO_CANDS.find(k => /demolici/i.test(k.nombre || '')) || DEMO_CANDS[0] || TASK.T02 || FIRST_TASK;
+const pickDemo = (...res) => { for (const re of res) { const k = DEMO_CANDS.find(k => re.test(k.nombre || '')); if (k) return k.id; } for (const re of res) { const k = DEMO_CANDS.find(k => re.test(k.desc || '')); if (k) return k.id; } return DEMO_MAIN?.id; };
+const TAPIAL_ON = (TASKS.find(k => /tapial/i.test(k.nombre || '') && !/retiro/i.test(k.nombre || '')) || FIRST_TASK)?.id;
+const TAPIAL_OFF = (TASKS.find(k => /tapial/i.test(k.nombre || '') && /retiro/i.test(k.nombre || '')) || TASKS.find(k => /retiro del tapial/i.test(k.desc || '')) || LAST_TASK)?.id;
+const CIM_TASKS = TASKS.filter(k => /cimentaci|excavaci|zapata|dados?\b/i.test(txt(k)));
+const CIM_EXC = (CIM_TASKS.find(k => /excavaci/i.test(k.nombre || '')) || CIM_TASKS[0] || (TASK.T03 && /cimentaci/i.test(TASK.T03.nombre) ? TASK.T03 : null))?.id;
+const CIM_PADS = (CIM_TASKS.find(k => /dados?\b/i.test(k.nombre || '')) || CIM_TASKS.find(k => /zapata/i.test(k.nombre || '') && !/excavaci/i.test(k.nombre || '')) || CIM_TASKS[0] || (TASK.T03 && /cimentaci/i.test(TASK.T03.nombre) ? TASK.T03 : null))?.id;
+let PADS_SCHEMATIC = false;
+
+function buildGenerated() {
+  // --- terreno, banqueta y estacionamiento
+  const groundMat = new THREE.MeshStandardMaterial({ color: '#d7d3c6', roughness: 1 });
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1000), groundMat);
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -0.16; ground.receiveShadow = true; scene.add(ground);
+  const apron = boxMesh(-18, 110, -0.16, -0.14, 14.2, 24, new THREE.MeshStandardMaterial({ color: '#c8c5bd', roughness: 1 })); apron.castShadow = false; scene.add(apron);
+  const asphalt = boxMesh(-30, 125, -0.16, -0.13, 24, 72, new THREE.MeshStandardMaterial({ color: '#6f7274', roughness: 1 })); asphalt.castShadow = false; scene.add(asphalt);
+  const stripes = [];
+  for (let u = -24; u <= 118; u += 2.6) for (const [va, vb] of [[27, 32], [44, 49], [49, 54]]) stripes.push(P(u, -0.11, va), P(u, -0.11, vb));
+  const stripeLines = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(stripes), new THREE.LineBasicMaterial({ color: '#e9e9e2', transparent: true, opacity: 0.8 }));
+  scene.add(stripeLines);
+  apron.userData.rs0 = apron.receiveShadow; asphalt.userData.rs0 = asphalt.receiveShadow;
+  UNDER_FADE.push([ground, 0.16], [apron, 0.12], [asphalt, 0.12], [stripeLines, 0.15]);
+
+  // --- nave de producción (contexto, translúcida)
+  const naveMat = new THREE.MeshStandardMaterial({ color: '#e3e7ea', roughness: 0.9, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide });
+  const nave = boxMesh(-12, 102, 0, 12.6, -62, 0.05, naveMat); nave.castShadow = false; nave.receiveShadow = false; scene.add(nave);
+  const naveEdges = new THREE.LineSegments(new THREE.EdgesGeometry(nave.geometry), new THREE.LineBasicMaterial({ color: '#8f99a3', transparent: true, opacity: 0.55 }));
+  naveEdges.position.copy(nave.position); scene.add(naveEdges);
+  nave.userData.rs0 = false;
+  UNDER_FADE.push([nave, 0.05], [naveEdges, 0.2]);
+
+  // --- ala de servicios existente (1 nivel, ejes B–E / 2–3), según fotografías de levantamiento:
+  //     azotea de membrana terracota con pretiles, terraza con velarias sobre la azotea y carpa de lockers al frente.
+  //     Se retira en la(s) tarea(s) de desmantelamiento (carpa, terraza y ala pueden ligarse a tareas distintas).
+  const roofMat = plainMaterial('#bf624b', { roughness: 0.95 });
+  const wallMat = plainMaterial('#f0f0ec');
+  const winMat = plainMaterial('#8fa3a8', { transparent: true, opacity: 0.55, roughness: 0.15 });
+  const frameMat = plainMaterial('#2f4f92', { roughness: 0.4 });
+  const deckMat = plainMaterial('#b5ab9f');
+  const sailMat = plainMaterial('#e6ddc8', { roughness: 0.9 });
+  const mastMat = plainMaterial('#efefec', { roughness: 0.5 });
+  const slatMat = plainMaterial('#4b3429');
+  const potMat = plainMaterial('#77736b'), greenMat = plainMaterial('#5f7d47');
+  const tentMat = plainMaterial('#eceae4', { roughness: 0.9 });
+  const meshMat = plainMaterial('#8b8984');
+  const doorMat = plainMaterial('#2e3338');
+  const old = [], terr = [], tent = [];
+  old.push(boxMesh(60.45, 83.62, 3.87, 4.0, 0.35, 7.36, roofMat));                    // azotea
+  old.push(boxMesh(60.45, 83.84, 3.87, 4.9, 7.36, 7.56, wallMat));                    // pretil frontal
+  old.push(boxMesh(83.62, 83.84, 3.87, 4.9, 0.5, 7.5, wallMat));                      // pretil testero
+  // muro en eje 2 con ventanas altas de marco azul
+  old.push(boxMesh(60.45, 83.8, 0.0, 1.9, 7.36, 7.56, wallMat));
+  old.push(boxMesh(60.45, 83.8, 2.95, 3.87, 7.36, 7.56, wallMat));
+  for (let u = 60.45; u < 83.7; u += 2.9) {
+    const w = Math.min(2.9, 83.8 - u);
+    old.push(boxMesh(u, u + 0.12, 1.9, 2.95, 7.36, 7.56, frameMat));
+    old.push(boxMesh(u + 0.12, u + w, 1.9, 2.95, 7.43, 7.49, winMat));
+  }
+  old.push(boxMesh(83.62, 83.84, 0.0, 3.87, 0.5, 7.5, wallMat));                      // muro testero en eje B
+  old.push(boxMesh(62.2, 63.3, 0.0, 2.3, 7.55, 7.62, frameMat));                      // puerta lateral azul
+  // terraza sobre la azotea: piso, velarias, celosía y jardineras
+  terr.push(boxMesh(60.7, 71.4, 4.0, 4.06, 0.8, 7.2, deckMat));
+  const sail = (a, b, c, d) => {                                                        // paraboloide hiperbólico entre 4 esquinas [u,z,v]
+    const g = new THREE.PlaneGeometry(1, 1, 10, 10), pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const s = pos.getX(i) + 0.5, t = pos.getY(i) + 0.5;
+      const q = [0, 1, 2].map(k => (1 - s) * (1 - t) * a[k] + s * (1 - t) * b[k] + s * t * c[k] + (1 - s) * t * d[k]);
+      const p = P(...q); pos.setXYZ(i, p.x, p.y, p.z);
+    }
+    g.computeVertexNormals(); const m = new THREE.Mesh(g, sailMat); m.castShadow = true; return m;
+  };
+  const mast = (u, v, top) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, top - 4.0, 8), mastMat); m.position.copy(P(u, (top + 4.0) / 2, v)); m.castShadow = true; return m; };
+  terr.push(sail([61.4, 6.7, 1.2], [66.3, 5.1, 1.4], [66.1, 6.9, 6.7], [61.2, 5.2, 6.5]));
+  terr.push(sail([66.8, 5.1, 1.2], [71.1, 7.0, 1.4], [70.9, 5.2, 6.7], [66.6, 6.8, 6.5]));
+  for (const [u, v, h] of [[61.4, 1.2, 6.9], [66.3, 1.4, 5.3], [66.1, 6.7, 7.1], [61.2, 6.5, 5.4], [71.1, 1.4, 7.2], [70.9, 6.7, 5.4]]) terr.push(mast(u, v, h));
+  for (let u = 63.0; u < 69.0; u += 0.16) terr.push(boxMesh(u, u + 0.07, 4.06, 5.8, 6.85, 6.93, slatMat));
+  for (const u of [61.3, 64.5, 68.0, 70.6]) { terr.push(boxMesh(u, u + 1.0, 4.06, 4.6, 1.0, 1.5, potMat)); terr.push(boxMesh(u + 0.1, u + 0.9, 4.6, 5.1, 1.05, 1.45, greenMat)); }
+  // carpa de lockers frente al ala (PVC blanco sobre estructura de aluminio)
+  const cu0 = 66.5, cu1 = 83.5, cv0 = 8.0, cv1 = 13.8, eave = 2.5, ridge = 3.5, cvm = (cv0 + cv1) / 2;
+  const quad = (a, b, c, d, mat) => {
+    const g = new THREE.BufferGeometry().setFromPoints([a, b, c, a, c, d].map(q => P(...q)));
+    g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; return m;
+  };
+  tent.push(boxMesh(cu0, cu1, 0.0, eave, cv0, cv0 + 0.05, tentMat), boxMesh(cu0, cu1, 0.0, eave, cv1 - 0.05, cv1, tentMat));
+  tent.push(boxMesh(cu0 + 0.3, cu1 - 0.3, 1.75, 2.2, cv1, cv1 + 0.03, meshMat), boxMesh(cu0 + 0.3, cu1 - 0.3, 1.75, 2.2, cv0 - 0.03, cv0, meshMat));
+  tent.push(quad([cu0, eave, cv0], [cu1, eave, cv0], [cu1, ridge, cvm], [cu0, ridge, cvm], tentMat));
+  tent.push(quad([cu0, eave, cv1], [cu0, ridge, cvm], [cu1, ridge, cvm], [cu1, eave, cv1], tentMat));
+  for (const u of [cu0, cu1]) {
+    tent.push(quad([u, 0, cv0], [u, 0, cv1], [u, eave, cv1], [u, eave, cv0], tentMat));
+    const g = new THREE.BufferGeometry().setFromPoints([[u, eave, cv0], [u, eave, cv1], [u, ridge, cvm]].map(q => P(...q))); g.computeVertexNormals();
+    tent.push(new THREE.Mesh(g, tentMat));
+  }
+  tent.push(boxMesh(cu1, cu1 + 0.04, 0.0, 2.1, cvm - 0.7, cvm + 0.7, doorMat));
+  const tAla = pickDemo(/muros|castillos/i, /\bala\b/i), tTerr = pickDemo(/terraza|velaria/i), tTent = pickDemo(/carpa/i, /lockers/i);
+  const usedMats = (ms) => [...new Set(ms.map(m => m.material))];
+  if (tAla === tTerr && tAla === tTent) genItem('D', tAla, [...old, ...terr, ...tent], usedMats([...old, ...terr, ...tent]));
+  else {
+    // materiales independientes por grupo para que cada parte se desvanezca con su propia tarea
+    const own = (ms) => { const map = new Map(); for (const m of ms) { if (!map.has(m.material)) map.set(m.material, m.material.clone()); m.material = map.get(m.material); } for (const mt of map.values()) patchMaterial(mt); return [...map.values()]; };
+    genItem('D', tAla, old, usedMats(old));
+    genItem('D', tTerr, terr, own(terr));
+    genItem('D', tTent, tent, own(tent));
+  }
+
+  // --- muro de cierre existente de las oficinas en el eje E (el DWF sólo trae el estado final, donde ya no existe):
+  //     cierra el edificio existente en el estado actual y durante la obra; se retira al conectar la ampliación (interiores PB)
+  {
+    const tMuroE = (TASKS.find(k => /interiores pb/i.test(k.nombre || '') && /muros/i.test(k.nombre || '')) || TASKS.find(k => /interiores/i.test(k.nombre || '')) || DEMO_MAIN)?.id;
+    const muroEMat = plainMaterial('#f0f0ec');
+    genItem('D', tMuroE, [boxMesh(60.22, 60.40, 0.0, 9.0, 0.5, 14.35, muroEMat)], [muroEMat], 'y', 'GEN');
+  }
+
+  // --- tapial perimetral de obra (instalación → retiro)
+  const tapMat = plainMaterial('#f4f4f1'), tapStripe = plainMaterial('#ef8a23');
+  const tap = [];
+  const runs = [[[60.7, 14.7], [60.7, 20.0]], [[60.7, 20.0], [100.6, 20.0]], [[100.6, 20.0], [100.6, -0.2]]];
+  for (const [[ua, va], [ub, vb]] of runs) {
+    const u0 = Math.min(ua, ub), u1 = Math.max(ua, ub) + (ua === ub ? 0.06 : 0), v0 = Math.min(va, vb), v1 = Math.max(va, vb) + (va === vb ? 0.06 : 0);
+    tap.push(boxMesh(u0, u1, -0.14, 2.1, v0, v1, tapMat), boxMesh(u0, u1, 2.1, 2.4, v0 - 0.01, v1 + 0.01, tapStripe));
+  }
+  const tapItem = genItem('T', TAPIAL_ON, tap, [tapMat, tapStripe], 'y', 'TMP');
+  tapItem.removeTask = TAPIAL_OFF;
+
+  // --- cimentación: excavaciones temporales + dados esquemáticos (sólo si el modelo no trae la cimentación de esa tarea)
+  if (CIM_EXC) {
+    const excMat = plainMaterial('#6d5a45', { roughness: 1 });
+    const exc = [];
+    for (const [u, v, big] of NEW_COLS) { const s = big ? 1.1 : 0.8; exc.push(boxMesh(u - s, u + s, 0.012, 0.03, v - s, v + s, excMat)); }
+    const excItem = genItem('T', CIM_EXC, exc, [excMat], 'y', 'TMP'); excItem.removeTask = CIM_EXC; excItem.removeAtEnd = true;
+  }
+  const modelFound = META.batches.some(b => b.task === CIM_PADS && b.disc === 'EST' && b.status === 'N');
+  if (CIM_PADS && !modelFound) {
+    const padMat = plainMaterial('#b9b5ad');
+    const pads = [];
+    for (const [u, v, big] of NEW_COLS) { const d = big ? 0.34 : 0.28; pads.push(boxMesh(u - d, u + d, -0.9, 0.07, v - d, v + d, padMat)); }
+    genItem('N', CIM_PADS, pads, [padMat], 'y', 'EST');
+    PADS_SCHEMATIC = true;
+  }
+}
+
+// ---------------------------------------------------------------- labels, grid and zones
+function makeLabel(text, opts = {}) {
+  const { bg = 'rgba(21,32,43,0.86)', fg = '#fff', size = 44, pad = 22, radius = 18, bold = 700, scale = 0.018, circle = false } = opts;
+  const c = document.createElement('canvas'); const g = c.getContext('2d');
+  g.font = `${bold} ${size}px Inter, system-ui, sans-serif`;
+  const w = circle ? size * 1.9 : Math.ceil(g.measureText(text).width + pad * 2), h = circle ? size * 1.9 : Math.ceil(size * 1.7);
+  c.width = w; c.height = h;
+  g.font = `${bold} ${size}px Inter, system-ui, sans-serif`;
+  g.fillStyle = bg;
+  if (circle) { g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 3, 0, Math.PI * 2); g.fill(); g.lineWidth = 5; g.strokeStyle = '#15202b'; g.stroke(); }
+  else { g.beginPath(); g.roundRect(0, 0, w, h, radius); g.fill(); }
+  g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + size * 0.04);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: opts.depthTest ?? false, transparent: true }));
+  sp.scale.set(w * scale, h * scale, 1); sp.renderOrder = 10;
+  return sp;
+}
+
+const OVER = { grid: new THREE.Group(), zones: new THREE.Group(), labels: new THREE.Group(), wc: new THREE.Group() };
+Object.values(OVER).forEach(g => scene.add(g));
+function buildOverlays() {
+  // ejes
+  const pts = [];
+  for (const u of Object.values(GRID)) pts.push(P(u, 0.05, -1.2), P(u, 0.05, 18.8));
+  for (const v of Object.values(AX)) pts.push(P(-10.5, 0.05, v), P(100.5, 0.05, v));
+  OVER.grid.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: '#34414e', transparent: true, opacity: 0.35 })));
+  for (const [k, u] of Object.entries(GRID)) {
+    const s = makeLabel(k, { circle: true, bg: '#ffffff', fg: '#15202b', size: 40, scale: 0.02, depthTest: true }); s.position.copy(P(u, 0.9, 19.6)); OVER.grid.add(s);
+  }
+  for (const [k, v] of Object.entries(AX)) {
+    for (const u of [101.4, -11.4]) { const s = makeLabel(k, { circle: true, bg: '#ffffff', fg: '#15202b', size: 40, scale: 0.02, depthTest: true }); s.position.copy(P(u, 0.9, v)); OVER.grid.add(s); }
+  }
+  // zona de ampliación A–E / 1–3
+  const zGeo = new THREE.BoxGeometry(GRID.A - GRID.E, 9.2, AX['1'] - AX['3']);
+  const zEdges = new THREE.LineSegments(new THREE.EdgesGeometry(zGeo), new THREE.LineBasicMaterial({ color: '#ef8a23', transparent: true, opacity: 0.95 }));
+  zEdges.position.copy(P((GRID.A + GRID.E) / 2, 4.6, (AX['1'] + AX['3']) / 2)); OVER.zones.add(zEdges);
+  const fillMat = new THREE.MeshBasicMaterial({ color: '#ef8a23', transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide });
+  const zFill = new THREE.Mesh(new THREE.PlaneGeometry(GRID.A - GRID.E, AX['1'] - AX['3']), fillMat);
+  zFill.rotation.x = -Math.PI / 2; zFill.position.copy(P((GRID.A + GRID.E) / 2, 0.06, (AX['1'] + AX['3']) / 2)); OVER.zones.add(zFill);
+  // zona sanitarios PB
+  for (const [u0, u1, v0, v1] of WC_ZONES) {
+    const g = new THREE.BoxGeometry(u1 - u0, 3.3, v1 - v0);
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(g), new THREE.LineBasicMaterial({ color: '#1d9a6c', transparent: true, opacity: 1 }));
+    e.position.copy(P((u0 + u1) / 2, 1.65, (v0 + v1) / 2)); OVER.wc.add(e);
+    const f = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: '#1d9a6c', transparent: true, opacity: 0.10, depthWrite: false }));
+    f.position.copy(e.position); OVER.wc.add(f);
+  }
+  // etiquetas
+  const l1 = makeLabel('AMPLIACIÓN · EJES A–E / 1–3', { bg: 'rgba(239,138,35,0.95)', size: 42, scale: 0.02 }); l1.position.copy(P(78.7, 11.8, 7.3)); OVER.labels.add(l1);
+  const l2 = makeLabel('OFICINAS EXISTENTES · EN OPERACIÓN', { bg: 'rgba(29,154,108,0.92)', size: 38, scale: 0.02 }); l2.position.copy(P(36, 11.2, 7.3)); OVER.labels.add(l2);
+  const l3 = makeLabel('NAVE DE PRODUCCIÓN (EXISTENTE)', { bg: 'rgba(90,103,116,0.85)', size: 34, scale: 0.02 }); l3.position.copy(P(40, 14.2, -14)); OVER.labels.add(l3);
+  const l4 = makeLabel(`SANITARIOS PB · META ${MS_LBL.toUpperCase()}`, { bg: 'rgba(29,154,108,0.95)', size: 36, scale: 0.016 }); l4.position.copy(P(71.6, 5.2, 5.2)); OVER.wc.add(l4);
+  const l5 = makeLabel('✓ SANITARIOS PB EN OPERACIÓN', { bg: 'rgba(14,92,67,0.97)', size: 36, scale: 0.016 }); l5.position.copy(P(71.6, 5.2, 5.2)); OVER.wc.add(l5);
+  OVER.wcLabel = l4; OVER.wcDone = l5;
+}
+
+// ---------------------------------------------------------------- camera presets (coordenadas del edificio: [u, z, v])
+const VIEWS = {
+  general: { pos: [8, 42, 84], tgt: [52, 1, 6], label: 'Vista general' },
+  ala: { pos: [104, 22, 44], tgt: [72, 1.5, 6], label: 'Ala existente' },
+  ampliacion: { pos: [112, 30, 52], tgt: [76, 2.5, 6], label: 'Ampliación A–E' },
+  cimentacion: { pos: [98, 19, 38], tgt: [79, 0, 7], label: 'Cimentación' },
+  estructura: { pos: [108, 22, 42], tgt: [78, 4, 6], label: 'Estructura' },
+  sanitarios: { pos: [79, 18, 23], tgt: [70.5, 0, 5], cut: 2.35, label: 'Sanitarios PB' },
+  cubierta: { pos: [112, 30, 44], tgt: [78, 6, 6], label: 'Cubierta' },
+  fachada: { pos: [70, 7.5, 58], tgt: [76, 5, 14], label: 'Fachada principal' },
+  pb: { pos: [102, 17, 32], tgt: [80, 0, 7], cut: 2.35, label: 'Planta baja' },
+  pa: { pos: [102, 21, 32], tgt: [78, 4.2, 7], cut: 6.45, label: 'Planta alta' },
+  terraza: { pos: [114, 12, 30], tgt: [92, 5, 10], label: 'Terraza' },
+  final: { pos: [124, 26, 64], tgt: [66, 4, 7], label: 'Vista final' },
+  aerea: { pos: [48, 118, 7.3], tgt: [48, 0, 7.2], label: 'Vista aérea' },
+  actual: { pos: [110, 24, 52], tgt: [60, 2, 6], label: 'Estado actual' },
+  // estructura e instalaciones (modelo 01-10-26)
+  instalaciones: { pos: [112, 28, 46], tgt: [79, 3, 7], label: 'Instalaciones' },
+  // bajo piso: corte al nivel del piso, terreno y pavimentos casi transparentes (redes enterradas y en el firme)
+  inst_bp: { pos: [110, 26, 44], tgt: [78, -1, 6], cut: 0.12, under: true, label: 'Bajo piso' },
+  inst_pb: { pos: [106, 19, 38], tgt: [79.5, 0.5, 7], cut: 3.6, label: 'Instalaciones PB' },
+  inst_pa: { pos: [106, 23, 38], tgt: [79.5, 4.2, 7], cut: 7.9, label: 'Instalaciones PA' },
+  azotea: { pos: [112, 33, 42], tgt: [80, 7, 7], label: 'Azotea' },
+};
+let camTween = null;
+// en modo Instalaciones los cortes de las vistas de arquitectura suben al plafón de cada nivel
+function effCut(v) {
+  let c = v.cut ?? null;
+  if (v.under) return c;   // bajo piso: el corte queda al nivel del piso en cualquier disciplina
+  if (c != null && state.disc === 'mep') c = c < 4 ? Math.max(c, 3.6) : (c < 8.1 ? Math.max(c, 7.9) : c);
+  return c;
+}
+function goView(name, dur = 1.8) {
+  const v = VIEWS[name]; if (!v) return;
+  const p1 = P(...v.pos), t1 = P(...v.tgt);
+  camTween = { p0: camera.position.clone(), t0: controls.target.clone(), p1, t1, start: performance.now(), dur: dur * 1000 };
+  state.view = name;
+  // entrar o salir de la vista bajo piso libera el corte fijado por los botones de nivel
+  if (v.under || underOn) {
+    forcedCut = null;
+    const lv = document.querySelector('#instLvl'), cur = lv && lv.querySelector('button.on');
+    const marca = v.under ? 'bp' : (cur && cur.dataset.l === 'bp' ? 'all' : null);   // si el cambio viene del propio selector, se respeta
+    if (lv && marca) lv.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.l === marca));
+  }
+  const saliendo = underOn && !v.under;
+  setUnder(!!v.under);
+  // bajo piso: los pisos de PB son opacos en «obra completa» y «arquitectura»; se ven las instalaciones con la arquitectura de referencia
+  // (al salir de la vista se regresa a la disciplina que se tenía, si el usuario no la cambió)
+  if (v.under && (state.disc === 'todo' || state.disc === 'arq') && discAvail('mep')) { discAntesUnder = state.disc; state.disc = 'mep'; refreshDiscUI(); applyState(); }
+  else if (saliendo && discAntesUnder && state.disc === 'mep') { state.disc = discAntesUnder; discAntesUnder = null; refreshDiscUI(); applyState(); }
+  else if (saliendo) discAntesUnder = null;
+  if (!chapterForcesCut()) setCut(effCut(v));
+  markView(name);
+}
+function setCut(h) { cutTarget = h == null ? 1000 : h; }
+// vista bajo piso: terreno, banqueta, estacionamiento y nave de contexto casi transparentes para ver lo enterrado
+const UNDER_FADE = [];
+let underOn = false, discAntesUnder = null;
+function setUnder(on) {
+  on = !!on; if (on === underOn) return; underOn = on;
+  for (const [obj, op] of UNDER_FADE) {
+    const m = obj.material; if (!m) continue;
+    if (m.userData.u0 == null) m.userData.u0 = { op: m.opacity, tr: m.transparent, dw: m.depthWrite };
+    const u0 = m.userData.u0;
+    m.transparent = on || u0.tr; m.opacity = on ? op : u0.op; m.depthWrite = on ? false : u0.dw; m.needsUpdate = true;
+    obj.receiveShadow = !on && obj.userData.rs0 !== false;
+  }
+  dirty = true;
+}
+let forcedCut = null;
+function chapterForcesCut() { return forcedCut !== null; }
+
+// ---------------------------------------------------------------- 4D state
+// disc: filtro de disciplinas ('todo' | 'arq' | 'est' | 'mep'); sysOff: sistemas ocultos (sólo en modo 'mep');
+// ghostArq: arquitectura y geometría de contexto como fantasma (true) u oculta (false) en los modos 'est' y 'mep'.
+const state = { t: T_START, playing: false, speed: 1, mode: 'real', chapter: 'actual', autoCam: true, labels: true, focusTask: null, lastMsShown: false, beforeAfter: 'after', view: null, disc: 'todo', sysOff: new Set(), ghostArq: true };
+const DAYS_PER_SEC = 4.2; // a 1×: ≈ 58 s para todo el programa
+const GHOST_OP = { est: 0.13, mep: 0.075 }, CONTEXT_OP = 0.24;
+const C_GHOST = '#e3e7eb', C_CONTEXT = '#a9b5c1', C_EST_N = '#3f6fa6', C_EST_E = '#b7c0c9';
+
+// papel de cada elemento según el filtro: 'full' | 'context' (tenue) | 'ghost' (fantasma) | 'hidden'
+function discRole(it, disc = state.disc) {
+  const k = it.disc;
+  if (disc === 'arq') return k === 'MEP' ? 'hidden' : 'full';
+  if (disc === 'est') {
+    if (k === 'EST') return 'full';
+    if (k === 'MEP') return 'hidden';
+    return state.ghostArq ? 'ghost' : 'hidden';
+  }
+  if (disc === 'mep') {
+    if (k === 'MEP') { const off = state.sysOff instanceof Set ? state.sysOff : new Set(state.sysOff || []); return off.has(it.sys) ? 'hidden' : 'full'; }
+    if (k === 'EST') return 'context';
+    if (k === 'TMP') return 'hidden';
+    return state.ghostArq ? 'ghost' : 'hidden';
+  }
+  return 'full';
+}
+const discAvail = (d) => d === 'todo' || (d === 'mep' && HAS.mep) || (d === 'est' && HAS.est) || (d === 'arq' && (HAS.mep || HAS.est));
+
+function applyState() {
+  const t = state.t;
+  const phaseMode = state.mode === 'fases';
+  const disc = discAvail(state.disc) ? state.disc : 'todo';
+  for (const it of ITEMS) {
+    const task = it.task ? TASK[it.task] : null;
+    const p = taskP(task, t);
+    const u = it.mats.map(m => m.userData.u);
+    let visible = true, tint = 0, tintColor = '#ef8a23', opacity = 1, revealH = 1e6, baseAmt = 0, baseColor = '#d9dde1';
+    if (it.status === 'E') {
+      if (phaseMode) { baseAmt = 0.72; baseColor = '#d3d8dc'; }
+    } else if (it.status === 'N') {
+      if (p <= 0) visible = false;
+      else if (p < 1) {
+        const e = easeIO(clamp(p / 0.9, 0, 1));
+        const b = it.bounds;
+        if (it.reveal === 'x') revealH = b.min.x + (b.max.x - b.min.x + 0.4) * e;
+        else revealH = b.min.y + (b.max.y - b.min.y + 0.3) * e;
+        tint = 0.62 * (1 - smooth(0.82, 1.0, p));
+      }
+      if (phaseMode && visible) { baseAmt = 0.64; baseColor = WC_IDS.has(it.task) ? '#1d9a6c' : '#3b8fd6'; }
+    } else if (it.status === 'D') {
+      if (p >= 1) visible = false;
+      else if (p > 0) { tint = 0.75; tintColor = '#d64541'; opacity = 1 - smooth(0.25, 1.0, p); }
+      if (phaseMode && p <= 0) { baseAmt = 0.72; baseColor = '#d3d8dc'; }
+    } else if (it.status === 'T') {
+      if (it.removeAtEnd) { visible = p > 0 && p < 1; opacity = p < 0.85 ? 1 : 1 - smooth(0.85, 1, p); }
+      else { const rt = it.removeTask ? TASK[it.removeTask] : null; const pr = taskP(rt, t); visible = p > 0 && pr < 1; opacity = p < 1 ? smooth(0, 0.6, p) : (pr > 0 ? 1 - smooth(0.2, 1, pr) : 1); }
+    }
+    if (state.beforeAfter === 'before' && state.chapter === 'resultado') visible = visible && it.status !== 'N';
+    // filtro de disciplinas (se combina con la máquina 4D: revelado por planos y tinte de obra se conservan)
+    const role = disc === 'todo' ? 'full' : discRole(it, disc);
+    if (role === 'hidden') visible = false;
+    else if (role === 'ghost') { opacity *= GHOST_OP[disc] || 0.1; baseAmt = 0.9; baseColor = C_GHOST; tint *= 0.6; }
+    else if (role === 'context') { opacity *= CONTEXT_OP; baseAmt = Math.max(baseAmt, 0.6); baseColor = C_CONTEXT; }
+    else if (disc === 'est' && it.disc === 'EST') { baseAmt = 0.55; baseColor = it.status === 'E' ? C_EST_E : C_EST_N; }
+    if (disc === 'mep' && it.disc === 'MEP') baseAmt = 0;   // las instalaciones conservan el color de su sistema
+    const shadow = role === 'full';
+    for (const m of it.meshes) { m.visible = visible; m.castShadow = shadow && m.userData.cast0; }
+    it.plane.normal.set(it.reveal === 'x' ? -1 : 0, it.reveal === 'x' ? 0 : -1, 0);
+    it.plane.constant = revealH;
+    for (let i = 0; i < it.mats.length; i++) {
+      const m = it.mats[i], uu = u[i];
+      uu.uTintAmt.value = tint; uu.uTint.value.set(tintColor);
+      uu.uBaseAmt.value = baseAmt; uu.uBase.value.set(baseColor);
+      const baseOp = m.userData.baseOpacity;
+      const op = baseOp * opacity;
+      const needT = m.userData.baseTransparent || op < 0.999;
+      if (m.transparent !== needT) { m.transparent = needT; m.needsUpdate = true; }
+      m.opacity = op; m.depthWrite = m.userData.baseDepthWrite && op > 0.98;
+    }
+  }
+  // superposiciones
+  const pWC = wcProgress(t);
+  OVER.wc.visible = state.chapter === 'alcance' || (state.chapter === 'proceso' && t < MS.t + 20 * DAY);
+  const wcDone = state.chapter === 'proceso' && t >= MS.t;
+  OVER.wcLabel.visible = !wcDone; OVER.wcDone.visible = wcDone;
+  OVER.zones.visible = state.chapter === 'alcance' || state.chapter === 'proceso' || state.chapter === 'actual';
+  OVER.labels.visible = state.labels && state.chapter !== 'resultado' && state.chapter !== 'instal';
+  OVER.grid.visible = state.labels;
+  updateStatus(t, pWC);
+  updateTimelineHead();
+  dirty = true;
+}
+
+function wcProgress(t) { if (t >= MS.t) return 1; const d = WC_TASKS.reduce((s, k) => s + (k.t1 - k.t0), 0); return d ? WC_TASKS.reduce((s, k) => s + taskP(k, t) * (k.t1 - k.t0), 0) / d : (t >= MS.t ? 1 : 0); }
+function totalProgress(t) { return TASKS.reduce((s, k) => s + taskP(k, t) * (k.t1 - k.t0), 0) / TOTAL_DUR; }
+
+// ---------------------------------------------------------------- status & timeline UI
+let lastActKey = '';
+function updateStatus(t, pWC) {
+  if (state.chapter !== 'proceso') return;
+  $('#stDate').textContent = fmtL(t);
+  const wk = Math.floor((t - WORK_T0) / (7 * DAY)) + 1;
+  $('#stWeek').textContent = t < WORK_T0 ? 'Antes del inicio de obra' : (t > WORK_T1 ? 'Obra terminada' : `Semana ${wk} de obra`);
+  const tot = Math.round(totalProgress(t) * 100);
+  $('#stTot').textContent = tot + '%'; $('#stTotBar').style.width = tot + '%';
+  const w = Math.round(pWC * 100);
+  $('#stWc').textContent = w >= 100 ? 'Terminados ✓' : w + '%'; $('#stWcBar').style.width = w + '%';
+  $('#stMsDate').textContent = fmt(MS.t);
+  const act = TASKS.filter(k => t >= k.t0 && t <= k.t1);
+  const MAXN = 6;
+  $('#stNow').innerHTML = act.length
+    ? act.slice(0, MAXN).map(k => `<div><span style="color:${gcol(k)}">●</span> ${esc(k.nombre)}</div>`).join('') + (act.length > MAXN ? `<div class="more">y ${act.length - MAXN} ${act.length - MAXN === 1 ? 'actividad' : 'actividades'} más</div>` : '')
+    : (t < WORK_T0 ? '<div>Estado actual (sin obra)</div>' : '<div>Obra terminada · entregada a AUO</div>');
+  $('#tlTask').textContent = act.length ? act[act.length - 1].grupo : (t < WORK_T0 ? 'Estado actual' : 'Terminado');
+  // renglones del Gantt
+  document.querySelectorAll('.grow[data-id]').forEach(row => {
+    const k = TASK[row.dataset.id]; if (!k) return;
+    const p = taskP(k, t);
+    row.classList.toggle('active', p > 0 && p < 1); row.classList.toggle('done', p >= 1);
+    const b = row.querySelector('.track i b'); if (b) b.style.width = (p * 100) + '%';
+  });
+  // encabezados de fase
+  for (const g of GANTT_GROUPS || []) {
+    const row = document.querySelector(`.ghead[data-g="${g.i}"]`); if (!row) continue;
+    const d = g.tasks.reduce((s, k) => s + (k.t1 - k.t0), 0) || 1;
+    const p = g.tasks.reduce((s, k) => s + taskP(k, t) * (k.t1 - k.t0), 0) / d;
+    row.classList.toggle('active', p > 0 && p < 1); row.classList.toggle('done', p >= 1);
+    const b = row.querySelector('.track i b'); if (b) b.style.width = (p * 100) + '%';
+    const pc = row.querySelector('.pc'); if (pc) pc.textContent = Math.round(p * 100) + '%';
+  }
+  // mientras se reproduce, mantener a la vista la actividad en curso
+  const key = act.map(k => k.id).join(',');
+  if (state.playing && key !== lastActKey && act.length) {
+    const r = document.querySelector(`#panel .grow[data-id="${CSS.escape(act[act.length - 1].id)}"]`), pn = $('#panel');
+    if (r && r.offsetParent === pn) {
+      const top = r.offsetTop, bot = top + r.offsetHeight;
+      if (top < pn.scrollTop + 30) pn.scrollTo({ top: Math.max(0, top - 60), behavior: 'smooth' });
+      else if (bot > pn.scrollTop + pn.clientHeight - 20) pn.scrollTo({ top: bot - pn.clientHeight + 60, behavior: 'smooth' });
+    }
+  }
+  lastActKey = key;
+  // hitos: aviso al cruzarlos durante la reproducción (el del cliente con más presencia)
+  if (t >= MS.t && !state.lastMsShown && state.playing) { state.lastMsShown = true; showBanner(MS); }
+  if (t < MS.t) state.lastMsShown = false;
+  for (const h of HITOS) {
+    if (h.main) continue;
+    if (t >= h.t && state.playing && !hitosShown.has(h.id)) { hitosShown.add(h.id); if (Math.abs(t - MS.t) > 4 * DAY) showBanner(h); }
+    if (t < h.t) hitosShown.delete(h.id);
+  }
+}
+const hitosShown = new Set();
+
+function tlX(t) { return (t - T_START) / (T_END - T_START); }
+function buildTimeline() {
+  const months = $('#tl .months'), bands = $('#tl .bands');
+  const d = new Date(T_START); if (d.getDate() !== 1) { d.setDate(1); d.setMonth(d.getMonth() + 1); }   // incluye el mes de inicio si el programa arranca el día 1
+  while (d.getTime() < T_END) {
+    const s = document.createElement('span'); s.style.left = (tlX(d.getTime()) * 100) + '%';
+    s.textContent = MESES[d.getMonth()] + (d.getMonth() === 0 ? ' ' + d.getFullYear() : ''); months.appendChild(s);
+    d.setMonth(d.getMonth() + 1);
+  }
+  const lanes = TASKS.length > 24 ? 5 : 4, lh = 26 / lanes;
+  TASKS.forEach((k, i) => {
+    const b = document.createElement('i');
+    b.style.left = (tlX(k.t0) * 100) + '%'; b.style.width = ((tlX(k.t1) - tlX(k.t0)) * 100) + '%';
+    b.style.top = ((i % lanes) * lh) + 'px'; b.style.height = Math.max(3, lh - 1.5) + 'px'; b.style.background = gcol(k); b.title = k.nombre;
+    bands.appendChild(b);
+  });
+  $('#tl .ms').style.left = (tlX(MS.t) * 100) + '%';
+  const ml = $('#tl .mslabel'); ml.style.left = (tlX(MS.t) * 100) + '%'; ml.textContent = 'Sanitarios PB · ' + fmt(MS.t);
+  for (const h of HITOS) if (!h.main) {   // hitos intermedios del programa detallado
+    const m = document.createElement('div'); m.className = 'ms2'; m.style.left = (tlX(h.t) * 100) + '%'; m.textContent = '◆'; m.title = `${h.titulo} · ${fmt(h.t)}`;
+    $('#tl').appendChild(m);
+  }
+  { const tc = toT(PROG.fechaCorte || PROG.corte || '2026-10-01'), el = $('#tl .today'); if (tc < T_START || tc > T_END) el.style.display = 'none'; else el.style.left = (tlX(tc) * 100) + '%'; }
+  const tl = $('#tl');
+  let drag = false;
+  const seek = (e) => { const r = tl.getBoundingClientRect(); const x = clamp((e.clientX - r.left) / r.width, 0, 1); state.t = T_START + x * (T_END - T_START); state.focusTask = null; applyState(); maybeAutoCam(true); };
+  tl.addEventListener('pointerdown', e => { drag = true; tl.setPointerCapture(e.pointerId); pause(); seek(e); });
+  tl.addEventListener('pointermove', e => { if (drag) seek(e); });
+  tl.addEventListener('pointerup', () => { drag = false; });
+  $('#btnPlay').addEventListener('click', () => state.playing ? pause() : play());
+  $('#speed').addEventListener('change', e => { state.speed = +e.target.value; });
+}
+function updateTimelineHead() {
+  $('#tl .head').style.left = (tlX(state.t) * 100) + '%';
+  $('#tlDate').textContent = fmt(state.t);
+}
+function play() { if (state.t >= T_END - DAY) state.t = T_START; state.playing = true; $('#btnPlay').textContent = '❚❚'; }
+function pause() { state.playing = false; $('#btnPlay').textContent = '▶'; }
+
+let bannerTimer = null, bannerUntil = 0;
+const bannerQueue = [];
+function showBanner(h = MS) {
+  // durante la reproducción, si ya hay un aviso a la vista, el siguiente espera su turno (hitos cercanos)
+  if (state.playing && $('#banner').classList.contains('show') && performance.now() < bannerUntil) { if (!bannerQueue.includes(h)) bannerQueue.push(h); return; }
+  const main = h === MS || h.main || h.id === MS.id;
+  $('#bnTitle').textContent = `${h.titulo} · ${fmtL(h.t)}`;
+  $('#bnText').textContent = h.detalle || '';
+  $('#banner').classList.toggle('sec', !main);
+  $('#banner .ic').textContent = main ? '✓' : '◆';
+  $('#banner').classList.add('show');
+  const dur = main ? 5200 : 3800; bannerUntil = performance.now() + dur;
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => { $('#banner').classList.remove('show'); bannerUntil = 0; const nx = bannerQueue.shift(); if (nx) setTimeout(() => showBanner(nx), 350); }, dur);
+}
+
+function focusTaskAt(t) {
+  let act = TASKS.filter(k => t >= k.t0 && t <= k.t1);
+  if (!act.length) return t < WORK_T0 ? null : 'final';
+  if (state.disc === 'mep' || state.disc === 'est') {
+    // con el filtro activo, la cámara sigue a las actividades de esa disciplina
+    const f = act.filter(k => taskHasDisc(k.id, state.disc)); if (f.length) act = f;
+  } else {
+    // prioridad: sanitarios PB mientras estén en ejecución, si no la tarea iniciada más recientemente
+    const wc = act.filter(k => WC_IDS.has(k.id));
+    if (wc.length && t > WC_T0 + 3 * DAY) return wc.reduce((a, b) => (b.t0 >= a.t0 ? b : a)).id;
+  }
+  return act.reduce((a, b) => (b.t0 >= a.t0 ? b : a)).id;
+}
+function viewOfTask(k) { return k && VIEWS[k.vista] ? k.vista : 'ampliacion'; }
+function maybeAutoCam(force = false) {
+  if (state.chapter !== 'proceso' || !state.autoCam) return;
+  const f = focusTaskAt(state.t);
+  if (f === state.focusTask && !force) return;
+  state.focusTask = f;
+  const view = f === null ? 'ala' : (f === 'final' ? 'final' : viewOfTask(TASK[f]));
+  if (VIEWS[view]) goView(view, force ? 1.0 : 2.2);
+}
+
+// ---------------------------------------------------------------- Gantt (agrupado por fase o por EDT de nivel 2)
+let GANTT_GROUPS = null;
+function edtNames() {
+  const out = {};
+  const r = PROG.resumenes || PROG.edt;
+  if (Array.isArray(r)) for (const x of r) { if (x && x.edt) out[x.edt] = x.nombre; }
+  else if (r && typeof r === 'object') Object.assign(out, r);
+  for (const t of PROG.tareas || []) if (t && t.tipo === 'R' && t.edt) out[t.edt] = t.nombre;
+  return out;
+}
+function groupTasks() {
+  const hasFase = TASKS.some(k => k.fase);
+  const hasEdt = !hasFase && TASKS.some(k => String(k.edt || '').split('.').length >= 3);
+  if (!hasFase && !hasEdt) return null;
+  const names = hasEdt ? edtNames() : {};
+  const map = new Map();
+  for (const k of TASKS) {
+    const key = hasFase ? (k.fase || 'Otras actividades') : String(k.edt || '').split('.').slice(0, 2).join('.');
+    if (!map.has(key)) map.set(key, { key, label: hasFase ? key : (names[key] || k.grupo || key), tasks: [] });
+    map.get(key).tasks.push(k);
+  }
+  return [...map.values()].map((g, i) => ({ ...g, i, t0: Math.min(...g.tasks.map(k => k.t0)), t1: Math.max(...g.tasks.map(k => k.t1)) }));
+}
+function ganttHTML() {
+  GANTT_GROUPS = groupTasks();
+  const msRow = (h) => h.main
+    ? `<div class="grow ms" data-ms="${esc(h.id)}" title="${esc(h.detalle || '')}"><div class="n" style="color:#137352;font-weight:700">★ ${esc(h.titulo)}<br><span style="font-weight:500">${fmtL(h.t)}</span></div><div class="track"><span class="star" style="left:${tlX(h.t) * 100}%">★</span></div></div>`
+    : `<div class="grow ms sec" data-ms="${esc(h.id)}" title="${esc(h.detalle || '')}"><div class="n">◆ ${esc(h.titulo)}<br><span>${fmtL(h.t)}</span></div><div class="track"><span class="star" style="left:${tlX(h.t) * 100}%">◆</span></div></div>`;
+  const row = (k) => {
+    const c = gcol(k);
+    return `<div class="grow" data-id="${esc(k.id)}" title="${esc(k.desc || k.nombre)}"><div class="n">${esc(k.nombre)}</div><div class="track"><i style="left:${tlX(k.t0) * 100}%;width:${(tlX(k.t1) - tlX(k.t0)) * 100}%;background:${c}33"><b style="background:${c}"></b></i></div></div>` + HITOS.filter(h => h.after === k.id).map(msRow).join('');
+  };
+  const head = HITOS.filter(h => !h.after || !TASK[h.after]).map(msRow).join('');
+  if (!GANTT_GROUPS) return head + TASKS.map(row).join('');
+  return head + GANTT_GROUPS.map(g => `
+    <div class="ghead" data-g="${g.i}" title="Mostrar u ocultar las actividades de esta fase"><div class="n"><span class="car">▾</span>${esc(g.label)}<small>${fmt(g.t0)} – ${fmt(g.t1 - DAY * 0.999)} · ${g.tasks.length} act. · <span class="pc">0%</span></small></div><div class="track"><i style="left:${tlX(g.t0) * 100}%;width:${(tlX(g.t1) - tlX(g.t0)) * 100}%"><b></b></i></div></div>
+    <div class="gbody" data-g="${g.i}">${g.tasks.map(row).join('')}</div>`).join('');
+}
+
+// ---------------------------------------------------------------- disciplinas: controles y panel de sistemas
+const DISC_LABEL = { todo: 'Todo', arq: 'Arquitectura', est: 'Estructura', mep: 'Instalaciones' };
+function discSegHTML(list, labels = DISC_LABEL, cls = '') {
+  const ok = list.filter(discAvail);
+  if (ok.length < 2) return '';
+  return `<div class="segmented discSeg ${cls}">${ok.map(d => `<button data-disc="${d}" class="${state.disc === d ? 'on' : ''}">${labels[d] || DISC_LABEL[d]}</button>`).join('')}</div>`;
+}
+function setDisc(d) {
+  state.disc = discAvail(d) ? d : 'todo';
+  if (!chapterForcesCut() && state.view && VIEWS[state.view]) setCut(effCut(VIEWS[state.view]));
+  refreshDiscUI();
+  applyState();
+  if (state.chapter === 'proceso' && state.autoCam) maybeAutoCam(true);
+}
+function setSysVisible(id, on = true) { if (on) state.sysOff.delete(id); else state.sysOff.add(id); refreshSysPanel(); applyState(); }
+function setSysOnly(ids) {
+  const want = new Set([].concat(ids));
+  const isOnly = SISTEMAS.every(s => want.has(s.id) ? !state.sysOff.has(s.id) : state.sysOff.has(s.id));
+  state.sysOff = new Set(isOnly ? [] : SISTEMAS.filter(s => !want.has(s.id)).map(s => s.id));   // segundo clic: todos de nuevo
+  refreshSysPanel(); applyState();
+}
+function setSysAll(on = true) { state.sysOff = new Set(on ? [] : SISTEMAS.map(s => s.id)); refreshSysPanel(); applyState(); }
+function setGhostArq(on) { state.ghostArq = !!on; refreshDiscUI(); applyState(); }
+
+function sisGroups(list) {
+  const out = []; const idx = {};
+  for (const s of list) { const g = s.grupo || 'Instalaciones'; if (!(g in idx)) { idx[g] = out.length; out.push({ g, list: [] }); } out[idx[g]].list.push(s); }
+  return out;
+}
+function buildSysPanel() {
+  const el = $('#sysPanel'); if (!el) return;
+  if (!HAS.mep) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="sp-head"><div><b>Sistemas de instalaciones</b><span>Colores por sistema · ${SISTEMAS.length} con elementos</span></div><span class="sp-hb"><button class="sp-cant" data-cant="sys" title="Cantidades de los sistemas visibles">Σ Cantidades</button><button class="sp-col" title="Contraer o expandir">▾</button></span></div>
+    <div class="sp-body">
+      <div class="sp-btns"><button data-all="1">Todos</button><button data-all="0">Ninguno</button></div>
+      ${sisGroups(SISTEMAS).map(({ g, list }) => `<div class="sp-grp">
+        <label class="sp-gh"><input type="checkbox" data-grp="${esc(g)}"><span>${esc(g)}</span></label>
+        ${list.map(s => `<div class="sp-row" data-row="${esc(s.id)}"><label title="${esc(DESC_SIS[s.id] || s.nombre)}"><input type="checkbox" data-sys="${esc(s.id)}"><i style="background:${s.color}"></i><span>${esc(s.nombre)}</span></label><button class="solo" data-solo="${esc(s.id)}" title="Mostrar sólo este sistema">Sólo</button></div>`).join('')}
+      </div>`).join('')}
+    </div>`;
+  el.querySelector('.sp-col').addEventListener('click', () => { el.classList.toggle('collapsed'); layoutRight(); });
+  el.querySelectorAll('[data-all]').forEach(b => b.addEventListener('click', () => setSysAll(b.dataset.all === '1')));
+  el.querySelectorAll('input[data-sys]').forEach(c => c.addEventListener('change', () => setSysVisible(c.dataset.sys, c.checked)));
+  el.querySelectorAll('[data-solo]').forEach(b => b.addEventListener('click', () => setSysOnly(b.dataset.solo)));
+  el.querySelectorAll('input[data-grp]').forEach(c => c.addEventListener('change', () => {
+    for (const s of SISTEMAS) if ((s.grupo || 'Instalaciones') === c.dataset.grp) { if (c.checked) state.sysOff.delete(s.id); else state.sysOff.add(s.id); }
+    refreshSysPanel(); applyState();
+  }));
+  refreshSysPanel();
+}
+function refreshSysPanel() {
+  const el = $('#sysPanel'); if (!el || !HAS.mep) return;
+  const off = state.sysOff;
+  const onIds = SISTEMAS.filter(s => !off.has(s.id)).map(s => s.id);
+  el.querySelectorAll('input[data-sys]').forEach(c => { c.checked = !off.has(c.dataset.sys); c.closest('.sp-row').classList.toggle('off', !c.checked); });
+  el.querySelectorAll('[data-solo]').forEach(b => b.classList.toggle('on', onIds.length === 1 && onIds[0] === b.dataset.solo));
+  el.querySelectorAll('input[data-grp]').forEach(c => {
+    const ids = SISTEMAS.filter(s => (s.grupo || 'Instalaciones') === c.dataset.grp).map(s => s.id);
+    const n = ids.filter(id => !off.has(id)).length;
+    c.checked = n === ids.length; c.indeterminate = n > 0 && n < ids.length;
+  });
+}
+function refreshDiscUI() {
+  document.querySelectorAll('[data-disc]').forEach(b => b.classList.toggle('on', b.dataset.disc === state.disc));
+  const sp = $('#sysPanel');
+  if (sp) sp.classList.toggle('show', HAS.mep && state.disc === 'mep' && state.chapter !== 'video');
+  refreshSysPanel();
+  buildToggles(state.chapter);
+  renderLegend();
+  const dimOn = state.disc === 'est' || state.disc === 'mep';
+  document.querySelectorAll('.grow[data-id]').forEach(r => r.classList.toggle('dim', dimOn && !taskHasDisc(r.dataset.id, state.disc)));
+  layoutRight();
+}
+const DISC_LEGEND = {
+  est: () => [[C_EST_N, 'Estructura nueva'], [C_EST_E, 'Estructura existente'], ...(state.ghostArq ? [[C_GHOST, 'Arquitectura (referencia)']] : [])],
+  mep: () => [[C_CONTEXT, 'Estructura (contexto)'], ...(state.ghostArq ? [[C_GHOST, 'Arquitectura (referencia)']] : []), [null, 'Instalaciones: color por sistema']],
+  arq: () => [[null, 'Sin instalaciones']]
+};
+function renderLegend() {
+  const C = CHAPTERS[state.chapter]; if (!C) return;
+  const items = [...C.legend, ...((DISC_LEGEND[state.disc] && state.chapter !== 'video') ? DISC_LEGEND[state.disc]() : [])];
+  $('#legend').innerHTML = items.map(([c, t]) => c ? `<span><i style="background:${c}"></i>${esc(t)}</span>` : `<span class="lg-note">${esc(t)}</span>`).join('');
+  $('#legend').style.display = items.length ? 'flex' : 'none';
+}
+// la columna derecha (estado 4D + sistemas) no debe encimarse con los botones de vistas
+function layoutRight() {
+  const sp = $('#sysPanel'); if (!sp || !sp.classList.contains('show')) return;
+  const views = $('#views').getBoundingClientRect();
+  const st = $('#status');
+  const top = st && st.offsetParent ? st.getBoundingClientRect().bottom + 10 : 74;
+  const bottom = views.height > 0 ? views.top - 12 : innerHeight - 16;
+  sp.style.maxHeight = Math.max(150, bottom - top) + 'px';
+}
+
+// ---------------------------------------------------------------- chapters
+const SW = (c, t) => `<div class="sw"><i style="background:${c}"></i><span>${t}</span></div>`;
+const MODELO = 'AUO.01-10-26.Expansión Oficinas.dwfx';
+const ORDER = ['actual', 'alcance', 'instal', 'proceso', 'resultado', 'video'];
+const CHAPTERS = {
+  actual: {
+    html: () => `
+      <div class="kicker">1 · Estado actual</div>
+      <h2>Oficinas existentes (antes BHTC)</h2>
+      <p>Las oficinas, adquiridas por AUO a BHTC, operan en un edificio de <b>dos niveles entre los ejes E y K</b>, con alas de un nivel en ambos extremos. En el tramo <b>A–E</b> está el <b>ala de servicios</b> (un nivel, ejes 2–3) con los sanitarios de planta baja, enfermería, lactario y vestidor; al frente, una <b>carpa de lockers</b>, y sobre su azotea, la <b>terraza con velarias</b>.</p>
+      <p>Identidad actual: fachada blanca, cancelería y parasoles en azul, pisos porcelánicos gris cálido en planta baja y tipo madera en planta alta.</p>
+      <div class="facts">
+        <div class="fact"><div class="v">2 niveles</div><div class="l">Edificio de oficinas ejes E–K (45 m)</div></div>
+        <div class="fact"><div class="v">≈ 162 m²</div><div class="l">Ala de servicios de 1 nivel, ejes B–E / 2–3</div></div>
+        <div class="fact"><div class="v">13.70 m</div><div class="l">Crujía entre ejes 1 y 3</div></div>
+        <div class="fact"><div class="v">103.85 m</div><div class="l">Longitud total del edificio (A–N)</div></div>
+      </div>
+      <h3>Fotografías del levantamiento</h3>
+      ${FOTOS.length ? `<div class="photos">${FOTOS.map((f, i) => `<button data-foto="${i}" title="${esc(f.titulo)}"><img loading="lazy" src="recursos/fotos/${f.archivo}" alt="${esc(f.titulo)}"></button>`).join('')}</div>` : '<p class="note">Sin fotografías cargadas.</p>'}
+      <p class="note">Fuentes: visitas de levantamiento (mayo, agosto y octubre de 2024), planos BHTC escaneados y modelo coordinado «${MODELO}» (arquitectura, estructura e instalaciones).</p>`,
+    view: 'actual', t: () => T_START, mode: 'real', timeline: false, status: false,
+    legend: [['#9aa4ad', 'Existente'], ['#ef8a23', 'Zona de ampliación A–E']]
+  },
+  alcance: {
+    html: () => `
+      <div class="kicker">2 · Alcance de la ampliación</div>
+      <h2>Ejes A–E / 1–3: dos niveles nuevos</h2>
+      <p>La ampliación ocupa el tramo entre los ejes <b>A y E</b> en toda la crujía <b>1–3</b> (36.55 × 13.70 m, ≈ 500 m² por nivel). En planta baja el ala de servicios crece a todo el fondo y hasta el eje A; en planta alta se construye un nivel nuevo de oficinas con terraza.</p>
+      <div class="segmented" id="lvlSeg"><button data-l="all" class="on">Completo</button><button data-l="pb">Planta baja</button><button data-l="pa">Planta alta</button></div>
+      <h3>Planta baja · N.P.T. ±0.00</h3>
+      <ul><li><b>Sanitarios y vestidores</b> (ejes C–D) · <span class="pill"><span class="dot"></span>en operación en ${MS_LBL} (instalaciones, acabados y muebles)</span></li>
+      <li>Lactario, sanitario accesible y consultorio (D–E)</li>
+      <li>Vestidores con casilleros (B–C)</li>
+      <li>Lavandería y área de contenedores (A–B)</li></ul>
+      <h3>Planta alta · N.P.T. +4.00</h3>
+      <ul><li>Oficinas abiertas: Producción, Finanzas y BH</li>
+      <li>Privados: IT, Producción, Finanzas y BH</li>
+      <li>Salas de juntas, sala Prod. Shop Floor y bodega</li>
+      <li>Sanitarios de planta alta (C–D)</li>
+      <li>Sala de usos múltiples y terraza con velaria (A–B)</li></ul>
+      <h3>Estructura</h3>
+      <div class="facts">
+        <div class="fact"><div class="v">31</div><div class="l">Columnas HSS nuevas (254 y 305 mm)</div></div>
+        <div class="fact"><div class="v">+4.00 m</div><div class="l">Entrepiso con losacero de 11.4 cm</div></div>
+        <div class="fact"><div class="v">+8.1 m</div><div class="l">Cubierta de lámina KR-18</div></div>
+        <div class="fact"><div class="v">3</div><div class="l">Castillos existentes a demoler (eje 3)</div></div>
+      </div>
+      <h3>Instalaciones</h3>
+      <p>Hidráulica, sanitaria y pluvial; protección contra incendio; aire acondicionado VRF con ventilación (ERV); eléctrica, alumbrado, voz y datos y seguridad electrónica. El detalle por sistema está en el capítulo <b>3 · Estructura e instalaciones</b>.</p>
+      <p class="note">Según planos AR_EO-01 a AR_EO-07 (Rev. 01) y el modelo coordinado «${MODELO}».</p>`,
+    view: 'ampliacion', t: () => T_END, mode: 'fases', timeline: false, status: false,
+    legend: [['#cfd4d8', 'Existente'], ['#2f86c9', 'Ampliación'], ['#1d9a6c', `Sanitarios PB (${MS_LBL})`], ['#ef8a23', 'Límite ejes A–E / 1–3']]
+  },
+  instal: {
+    html: () => {
+      const groups = sisGroups(SIS_ALL);
+      const conGeo = new Set(SISTEMAS.map(s => s.id));
+      return `
+      <div class="kicker">3 · Estructura e instalaciones</div>
+      <h2>Estructura e instalaciones de la ampliación</h2>
+      <p>El modelo coordinado del <b>1 de octubre de 2026</b> integra la arquitectura, la estructura y las ingenierías de la ampliación. Aísle la estructura o las instalaciones y use los cortes por nivel para revisar las redes bajo piso, de planta baja y de planta alta.</p>
+      ${discSegHTML(['est', 'mep', 'todo'], { est: 'Estructura', mep: 'Instalaciones', todo: 'Modelo completo' })}
+      <div class="segmented" id="instLvl"><button data-l="all" class="on">Completo</button><button data-l="bp" title="Redes enterradas y en el firme: drenajes, agua, ductos eléctricos en piso y red de tierras">Bajo piso</button><button data-l="pb">PB · corte a 3.60 m</button><button data-l="pa">PA · corte a 7.90 m</button><button data-l="az">Azotea</button></div>
+      <h3>Estructura</h3>
+      <div class="facts">
+        <div class="fact"><div class="v">31</div><div class="l">Columnas HSS nuevas de 254 y 305 mm</div></div>
+        <div class="fact"><div class="v">ZA1–ZA5 · ZC1</div><div class="l">Zapatas aisladas con dado, zapata corrida y trabe de liga</div></div>
+        <div class="fact"><div class="v">+4.00 m</div><div class="l">Entrepiso con losacero de 11.4 cm</div></div>
+        <div class="fact"><div class="v">+8.1 m</div><div class="l">Cubierta de lámina KR-18</div></div>
+      </div>
+      <ul>
+        <li><b>Cimentación:</b> zapatas aisladas con dado ZA1 a ZA5, zapata corrida ZC1 y trabe de liga de 25 × 40 cm, con placas base y anclas para las columnas.</li>
+        <li><b>Columnas:</b> secciones HSS C1 a C3 de 254 × 254 mm (espesores de 7.9 a 15.9 mm) y C4 de 305 × 305 mm, en la retícula de ejes A–E / 1–3.</li>
+        <li><b>Entrepiso (N.P.T. +4.00):</b> trabes y vigas de perfil IR (T7 a T12, V1 a V4) con losacero de 11.4 cm de espesor total.</li>
+        <li><b>Cubierta (+8.1 m):</b> trabes IR (T1, T3, T4 y T6), montenes dobles tipo caja cal. 14 de 8", 10" y 12", tensores de contraventeo y lámina KR-18.</li>
+      </ul>
+      ${window.AUO_CANT ? `<button class="cantBtn" data-cant="1"><b>Σ</b><span><b>Cantidades de instalaciones</b><small>Totales de tuberías, ductos, canalizaciones, conexiones, accesorios, equipos y salidas, con filtros por sistema, tipo, nivel y actividad</small></span></button>` : ''}
+      <h3>Instalaciones por sistema</h3>
+      ${SIS_ALL.length ? `<div class="sislist">${groups.map(({ g, list }) => `<div class="g">${esc(g)}</div>${list.map(s => `<div class="s${conGeo.has(s.id) ? '' : ' nogeo'}"${conGeo.has(s.id) ? ` data-solo-sys="${esc(s.id)}" title="Ver sólo este sistema"` : ''}><i style="background:${s.color}"></i><div><b>${esc(s.nombre)}</b><span>${esc(DESC_SIS[s.id] || '')}${conGeo.has(s.id) ? '' : ' (sin elementos en el modelo cargado)'}</span></div></div>`).join('')}`).join('')}</div>` : '<p class="note">El modelo cargado no distingue disciplinas ni sistemas de instalaciones.</p>'}
+      <div class="facts">
+        <div class="fact"><div class="v">${SIS_ALL.length || '—'}</div><div class="l">Sistemas de instalaciones identificados en el modelo</div></div>
+        <div class="fact"><div class="v">6</div><div class="l">Modelos de instalaciones: hidráulico, sanitario, pluvial, eléctrico (SLYA), HVAC y PCI</div></div>
+      </div>
+      <p class="note">Modelo fuente: «${MODELO}» · modelos vinculados: arquitectónico, estructural, hidráulico, sanitario, pluvial, eléctrico y especiales, HVAC y protección contra incendio.${META._demo ? ' <b>Vista de prueba con disciplinas y sistemas ficticios (?demo_sistemas=1).</b>' : ''}</p>`;
+    },
+    view: 'instalaciones', t: () => T_END, mode: 'real', timeline: false, status: false,
+    disc: () => HAS.mep ? 'mep' : (HAS.est ? 'est' : 'todo'),
+    legend: []
+  },
+  proceso: {
+    html: () => `
+      <div class="kicker">4 · Proceso constructivo 4D</div>
+      <h2>Secuencia de obra propuesta</h2>
+      <p>Reproduzca la línea de tiempo para ver cómo avanza la obra. Los elementos nuevos aparecen en <b style="color:#b2610d">naranja</b> mientras se construyen y lo retirado se marca en <b style="color:#d64541">rojo</b>. <b>Las oficinas existentes (ejes E–N) siguen operando</b> durante toda la obra, separadas por un tapial.</p>
+      <div class="segmented" id="camSeg"><button data-c="auto" class="${state.autoCam ? 'on' : ''}">Cámara automática</button><button data-c="free" class="${state.autoCam ? '' : 'on'}">Cámara libre</button></div>
+      ${discSegHTML(['todo', 'est', 'mep'], { todo: 'Obra completa', est: 'Sólo estructura', mep: 'Sólo instalaciones' })}
+      ${window.AUO_CANT ? `<button class="cantBtn sm" data-cant="1"><b>Σ</b><span><b>Cantidades de instalaciones a la fecha</b><small>Lo instalado según el programa, por sistema y tipo</small></span></button>` : ""}
+      <div class="gantt">${ganttHTML()}</div>
+      <p class="note">Programa referencial para visualización; consulte el programa de obra en Excel y MS Project (carpeta «PROGRAMA DE OBRA»).${PADS_SCHEMATIC ? ' La cimentación se muestra de forma esquemática.' : ''}</p>`,
+    view: 'ala', t: () => T_START, mode: 'real', timeline: true, status: true,
+    legend: [['#9aa4ad', 'Existente en operación'], ['#d64541', 'Se retira'], ['#ef8a23', 'En construcción'], ['#1d9a6c', 'Sanitarios PB']]
+  },
+  resultado: {
+    html: () => `
+      <div class="kicker">5 · Resultado final</div>
+      <h2>Oficinas AUO ampliadas</h2>
+      <p>Edificio continuo de dos niveles de A a K con la misma identidad del conjunto existente: fachada blanca con ventanas corridas, cancelería y parasoles en azul y terraza con velaria en el extremo A.</p>
+      <div class="segmented" id="baSeg"><button data-b="before">Antes</button><button data-b="after" class="on">Después</button></div>
+      <h3>Materiales y acabados (según especificación)</h3>
+      <div class="swatches">
+        ${SW('#f0f0ec', 'Fachada y muros: aplanado fino con pintura vinil acrílica blanca (Comex Vinimex)')}
+        ${SW('#2f4f92', 'Cancelería exterior y parasoles en azul, como el edificio existente')}
+        ${SW('#eceae4', 'Sanitarios: loseta porcelánica Absolut Bianco 60×60 (Interceramic)')}
+        ${SW('#bdbcb6', 'Mamparas de sanitarios en HPL gris claro (igual a las existentes)')}
+        ${SW('#bdb7af', 'Piso PB: cerámico Avant Garde Cemento Creta Grey y Tecnoarte Grey')}
+        ${SW('#b4a99c', 'Piso oficinas PA: cerámico tipo madera Eternum Brumma')}
+        ${SW('#b07a4e', 'Puertas de chapa de encino con marco gris')}
+        ${SW('#ecebe6', 'Plafón modular reticular 61×61 blanco')}
+        ${SW('#d3e3e8', 'Canceles de cristal templado 9.5 mm')}
+        ${SW('#aba59c', 'Terraza: cerámico exterior Fusion Gray 15×75')}
+      </div>
+      <p class="note">Recorra el modelo con el ratón: arrastre para girar, rueda para acercar y botón derecho para desplazar. Con el selector <b>Ver</b> (abajo a la derecha) puede revisar por separado la arquitectura, la estructura y las instalaciones.</p>`,
+    view: 'final', t: () => T_END, mode: 'real', timeline: false, status: false,
+    legend: []
+  },
+  video: {
+    html: () => `
+      <div class="kicker">6 · Video</div>
+      <h2>Animación 4D</h2>
+      <p>Recorrido completo: estado actual, alcance, estructura e instalaciones, proceso constructivo con el hito de sanitarios de planta baja en ${MESES_L[MS_D.getMonth()]} y resultado final.</p>`,
+    view: 'final', t: () => T_END, mode: 'real', timeline: false, status: false, legend: []
+  }
+};
+
+function setChapter(ch) {
+  const C = CHAPTERS[ch]; if (!C) return;
+  state.chapter = ch;
+  document.querySelectorAll('#chapters button').forEach(b => b.classList.toggle('on', b.dataset.ch === ch));
+  pause();
+  state.t = C.t(); state.mode = C.mode; state.focusTask = null; forcedCut = null; state.beforeAfter = 'after';
+  const d = C.disc ? C.disc() : 'todo'; state.disc = discAvail(d) ? d : 'todo'; discAntesUnder = null;
+  $('#panel').innerHTML = C.html();
+  $('#panel').classList.remove('collapsed');
+  $('#panel').classList.toggle('withtl', !!C.timeline);
+  $('#panel').scrollTop = 0;
+  $('#timeline').style.display = C.timeline ? 'flex' : 'none';
+  $('#status').style.display = C.status ? 'block' : 'none';
+  $('#views').style.bottom = C.timeline ? '112px' : '16px';
+  $('#legend').style.bottom = C.timeline ? '112px' : '16px';
+  $('#videoWrap').classList.toggle('show', ch === 'video');
+  if (ch === 'video') loadVideo();
+  else { const v = $('#video'); if (v && !v.paused) v.pause(); }
+  setCut(null);
+  goView(C.view, 1.6);
+  wireChapter(ch);
+  buildViewButtons(ch);
+  refreshDiscUI();
+  applyState();
+}
+
+function wireChapter(ch) {
+  const panel = $('#panel');
+  panel.querySelectorAll('[data-foto]').forEach(b => b.addEventListener('click', () => openLightbox(+b.dataset.foto)));
+  panel.querySelectorAll('#lvlSeg button').forEach(b => b.addEventListener('click', () => {
+    panel.querySelectorAll('#lvlSeg button').forEach(x => x.classList.toggle('on', x === b));
+    const l = b.dataset.l; forcedCut = l === 'pb' ? 3.3 : (l === 'pa' ? 7.2 : null); setCut(forcedCut);
+    goView(l === 'pb' ? 'pb' : (l === 'pa' ? 'pa' : 'ampliacion'), 1.4);
+    if (forcedCut !== null) setCut(l === 'pb' ? 2.35 : 6.45);
+  }));
+  panel.querySelectorAll('#instLvl button').forEach(b => b.addEventListener('click', () => {
+    panel.querySelectorAll('#instLvl button').forEach(x => x.classList.toggle('on', x === b));
+    const l = b.dataset.l;
+    const view = l === 'bp' ? 'inst_bp' : l === 'pb' ? 'inst_pb' : l === 'pa' ? 'inst_pa' : l === 'az' ? 'azotea' : (state.disc === 'est' ? 'estructura' : 'instalaciones');
+    forcedCut = null; goView(view, 1.4);
+    forcedCut = VIEWS[view].cut ?? null;   // el corte se mantiene al cambiar de vista con los botones inferiores
+    if (forcedCut !== null) setCut(forcedCut);
+  }));
+  panel.querySelectorAll('[data-solo-sys]').forEach(r => r.addEventListener('click', () => {
+    if (state.disc !== 'mep') setDisc('mep');
+    setSysOnly(r.dataset.soloSys);
+  }));
+  panel.querySelectorAll('#camSeg button').forEach(b => b.addEventListener('click', () => {
+    panel.querySelectorAll('#camSeg button').forEach(x => x.classList.toggle('on', x === b));
+    state.autoCam = b.dataset.c === 'auto'; if (state.autoCam) maybeAutoCam(true);
+  }));
+  panel.querySelectorAll('#baSeg button').forEach(b => b.addEventListener('click', () => {
+    panel.querySelectorAll('#baSeg button').forEach(x => x.classList.toggle('on', x === b));
+    state.beforeAfter = b.dataset.b; applyState();
+  }));
+  panel.querySelectorAll('.discSeg button').forEach(b => b.addEventListener('click', () => setDisc(b.dataset.disc)));
+  panel.querySelectorAll('.ghead').forEach(h => h.addEventListener('click', () => {
+    const body = panel.querySelector(`.gbody[data-g="${h.dataset.g}"]`); if (!body) return;
+    body.classList.toggle('collapsed'); h.classList.toggle('collapsed', body.classList.contains('collapsed'));
+  }));
+  panel.querySelectorAll('.grow[data-id]').forEach(r => r.addEventListener('click', () => {
+    const k = TASK[r.dataset.id]; pause(); state.t = k.t0 + (k.t1 - k.t0) * 0.6; state.focusTask = null; applyState();
+    if (state.autoCam) maybeAutoCam(true); else goView(viewOfTask(k), 1.4);
+  }));
+  panel.querySelectorAll('.grow[data-ms]').forEach(r => r.addEventListener('click', () => {
+    const h = HITOS.find(x => x.id === r.dataset.ms) || MS; pause(); state.t = h.t + DAY * 0.5; state.focusTask = null; applyState();
+    goView(h.main ? 'sanitarios' : viewOfTask(TASK[h.after]), 1.4); showBanner(h);
+  }));
+}
+
+function buildViewButtons(ch) {
+  const sets = {
+    actual: ['actual', 'general', 'aerea', 'fachada'],
+    alcance: ['ampliacion', 'general', 'aerea', 'sanitarios', 'terraza'],
+    instal: ['instalaciones', 'inst_bp', 'inst_pb', 'inst_pa', 'azotea', 'estructura', 'cimentacion'],
+    proceso: ['general', 'ampliacion', 'sanitarios', 'estructura', 'instalaciones', 'inst_bp', 'aerea'],
+    resultado: ['final', 'fachada', 'terraza', 'pa', 'pb', 'aerea', 'general'],
+    video: []
+  };
+  // selector de disciplinas (compacto) en la barra de vistas
+  const seg = ch === 'video' ? '' : discSegHTML(['todo', 'arq', 'est', 'mep']);
+  $('#discBtns').innerHTML = seg ? `<div class="discbar"><span class="lbl">Ver</span>${seg}</div>` : '';
+  $('#discBtns').style.display = seg ? 'flex' : 'none';
+  $('#discBtns').querySelectorAll('button[data-disc]').forEach(b => b.addEventListener('click', () => setDisc(b.dataset.disc)));
+  $('#viewBtns').innerHTML = (sets[ch] || []).map(v => `<button class="chip" data-v="${v}">${VIEWS[v].label}</button>`).join('');
+  $('#viewBtns').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { if (state.chapter === 'proceso') { state.autoCam = false; document.querySelectorAll('#camSeg button').forEach(x => x.classList.toggle('on', x.dataset.c === 'free')); } goView(b.dataset.v); }));
+  markView(state.view);
+  buildToggles(ch);
+}
+function buildToggles(ch) {
+  const ghostChip = (state.disc === 'est' || state.disc === 'mep') ? `<button class="chip ${state.ghostArq ? 'on' : ''}" id="tgGhost" title="Mostrar la arquitectura como referencia tenue u ocultarla">Arquitectura de referencia</button>` : '';
+  $('#toggleBtns').innerHTML = ch === 'video' ? '' : `${ghostChip}
+    <button class="chip ${state.labels ? 'on' : ''}" id="tgLabels">Ejes y etiquetas</button>
+    <button class="chip ${renderer.shadowMap.enabled ? 'on' : ''}" id="tgShadows">Sombras</button>`;
+  const tg = $('#tgGhost'); if (tg) tg.addEventListener('click', () => setGhostArq(!state.ghostArq));
+  const tl = $('#tgLabels'); if (tl) tl.addEventListener('click', () => { state.labels = !state.labels; tl.classList.toggle('on', state.labels); applyState(); });
+  const ts = $('#tgShadows'); if (ts) ts.addEventListener('click', () => { renderer.shadowMap.enabled = !renderer.shadowMap.enabled; ts.classList.toggle('on', renderer.shadowMap.enabled); scene.traverse(o => { if (o.material) { (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.needsUpdate = true); } }); dirty = true; });
+}
+function markView(name) { document.querySelectorAll('#viewBtns .chip').forEach(b => b.classList.toggle('on', b.dataset.v === name)); }
+
+// ---------------------------------------------------------------- lightbox & video
+let lbIndex = 0;
+function openLightbox(i) {
+  lbIndex = (i + FOTOS.length) % FOTOS.length; const f = FOTOS[lbIndex];
+  const lb = $('#lightbox'); lb.querySelector('img').src = 'recursos/fotos/' + f.archivo; lb.querySelector('img').alt = f.titulo;
+  lb.querySelector('figcaption').innerHTML = `${esc(f.titulo)}<span>${esc([f.nivel, f.fecha].filter(Boolean).join(' · '))} · ${lbIndex + 1} / ${FOTOS.length}</span>`;
+  lb.classList.add('show');
+}
+$('#lightbox .close').addEventListener('click', () => $('#lightbox').classList.remove('show'));
+$('#lightbox .prev').addEventListener('click', () => openLightbox(lbIndex - 1));
+$('#lightbox .next').addEventListener('click', () => openLightbox(lbIndex + 1));
+$('#lightbox').addEventListener('click', e => { if (e.target.id === 'lightbox') $('#lightbox').classList.remove('show'); });
+function loadVideo() {
+  const v = $('#video'); const src = 'Video%204D%20AUO.mp4';
+  if (!v.getAttribute('src')) { v.src = src; $('#videoLink').href = src; }
+  $('#videoCap').textContent = 'Simulación 4D · Expansión de Oficinas AUO · ejes A–E / 1–3';
+  v.onerror = () => { $('#videoCap').textContent = 'No se encontró «Video 4D AUO.mp4» junto a la presentación.'; };
+}
+
+// ---------------------------------------------------------------- input
+document.querySelectorAll('#chapters button').forEach(b => b.addEventListener('click', () => setChapter(b.dataset.ch)));
+$('#btnPanel').addEventListener('click', () => $('#panel').classList.toggle('collapsed'));
+$('#btnFull').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); });
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (document.getElementById('cant')?.classList.contains('show')) return;   // panel de cantidades abierto
+  if ($('#lightbox').classList.contains('show')) {
+    if (e.key === 'Escape') $('#lightbox').classList.remove('show');
+    if (e.key === 'ArrowLeft') openLightbox(lbIndex - 1); if (e.key === 'ArrowRight') openLightbox(lbIndex + 1); return;
+  }
+  if (e.code === 'Space' && state.chapter === 'proceso') { e.preventDefault(); state.playing ? pause() : play(); }
+  const n = +e.key; if (n >= 1 && n <= ORDER.length) setChapter(ORDER[n - 1]);
+});
+controls.addEventListener('start', () => { camTween = null; });
+controls.addEventListener('change', () => { dirty = true; });
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight, false); layoutRight(); dirty = true; });
+
+// ---------------------------------------------------------------- loop
+let dirty = true, last = performance.now();
+function frame(now) {
+  if (window.AUO_REC) { last = now; requestAnimationFrame(frame); return; }   // grabación de video en curso
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (state.playing) {
+    state.t += dt * DAYS_PER_SEC * state.speed * DAY;
+    if (state.t >= T_END) { state.t = T_END; pause(); }
+    applyState(); maybeAutoCam();
+  }
+  if (camTween) {
+    const k = clamp((now - camTween.start) / camTween.dur, 0, 1), e = easeIO(k);
+    camera.position.lerpVectors(camTween.p0, camTween.p1, e); controls.target.lerpVectors(camTween.t0, camTween.t1, e);
+    if (k >= 1) camTween = null; dirty = true;
+  }
+  if (Math.abs(cutCurrent - cutTarget) > 0.001) {
+    const a = cutCurrent > 100 && cutTarget < 100 ? 12 : cutCurrent;   // entrar al corte desde arriba del edificio
+    cutCurrent = a + (cutTarget - a) * Math.min(1, dt * 5); if (Math.abs(cutCurrent - cutTarget) < 0.01 || cutTarget > 100 && cutCurrent > 14) cutCurrent = cutTarget;
+    cutPlane.constant = cutCurrent; dirty = true;
+  }
+  if (OVER.wc.visible) { const s = 0.55 + 0.45 * Math.sin(now / 350); OVER.wc.children.forEach(o => { if (o.isLineSegments) o.material.opacity = 0.45 + 0.55 * s; }); dirty = true; }
+  const changed = controls.update();
+  if (dirty || changed) { renderer.render(scene, camera); dirty = false; }
+  requestAnimationFrame(frame);
+}
+
+// ---------------------------------------------------------------- boot
+async function boot() {
+  try {
+    setLoad(15, 'Preparando visor…');
+    const buf = await decodeModel();
+    setLoad(65, 'Construyendo modelo 3D…');
+    buildModel(buf);
+    buildGenerated();
+    buildSistemas();
+    buildTaskDisc();
+    buildOverlays();
+    buildTimeline();
+    buildSysPanel();
+    setLoad(90, 'Listo');
+    const v = VIEWS.actual; camera.position.copy(P(...v.pos).add(new THREE.Vector3(40, 30, 40))); controls.target.copy(P(...v.tgt));
+    const ch = QS.get('cap');
+    setChapter(CHAPTERS[ch] ? ch : 'actual');
+    if (QS.get('disc')) setDisc(QS.get('disc'));
+    renderer.compile(scene, camera);
+    requestAnimationFrame(frame);
+    setTimeout(() => { setLoad(100); $('#loading').classList.add('hide'); }, 250);
+    window.AUO = {
+      THREE, scene, camera, controls, renderer, state, ITEMS, TASKS, TASK, MS, VIEWS, P, applyState, goView, setChapter, setCut, OVER, play, pause, T_START, T_END, cutPlane, wcProgress, totalProgress, GROUP_COLORS, FOTOS, PROG, fmt, fmtL,
+      // disciplinas y sistemas (modelo 01-10-26)
+      setDisc, setSysVisible, setSysOnly, setSysAll, setGhostArq, discRole, discAvail, effCut, HAS, get SISTEMAS() { return SISTEMAS; }, get SIS_ALL() { return SIS_ALL; }, SIS, DEFAULT_SISTEMAS,
+      // tareas clave del programa (válidas con el programa de 14 tareas y con el detallado)
+      WC_TASKS, WC_IDS, WORK_T0, WORK_T1, FIRST_TASK, LAST_TASK, HITOS, CHAPTERS, ORDER, MODELO, focusTaskAt, maybeAutoCam, viewOfTask, taskHasDisc, showBanner,
+      get dirty() { return dirty; }, set dirty(v) { dirty = v; }, get cutTarget() { return cutTarget; }, get underOn() { return underOn; }, OCULTA_SUELO: UNDER_FADE.slice(0, 3).map(x => x[0])
+    };
+    window.__AUO_READY = true;
+  } catch (err) {
+    console.error(err);
+    setLoad(100, 'Error al cargar el modelo: ' + err.message);
+  }
+}
+boot();
+</script>
+<script>
+  // Si no hay conexión para cargar el visor 3D, avisar.
+  setTimeout(() => { if (!window.__AUO_APP) { const m = document.getElementById('loadMsg'); if (m) m.textContent = 'No se pudo cargar el visor 3D. Verifique la conexión a internet (se requiere para la librería 3D) y abra el archivo con Chrome o Edge.'; } }, 20000);
+</script>
+</body>
+</html>
