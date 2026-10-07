@@ -42,6 +42,7 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
   --ind: #A8864F;
   --arq: #B07068;
   --tec: #52708D;
+  --imp: #5F8574;
   --accent: var(--ind);
   --shade: rgba(24, 24, 22, .16);
   --drop: 0 1px 2px rgba(24, 24, 22, .10), 0 22px 48px -18px rgba(24, 24, 22, .45);
@@ -51,18 +52,19 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ground: #1C1C1B; --shelf: #2B2B29; --paper: #FFFFFF; --edge: #BDBBB5; --ink: #ECEAE5; --muted: #A09E97;
-    --line: #3B3A37; --panel: rgba(28, 28, 27, .92); --ind: #CDA96F; --arq: #D59C94; --tec: #8EABC6;
+    --line: #3B3A37; --panel: rgba(28, 28, 27, .92); --ind: #CDA96F; --arq: #D59C94; --tec: #8EABC6; --imp: #97BFAC;
     --shade: rgba(0, 0, 0, .35); --drop: 0 1px 2px rgba(0, 0, 0, .4), 0 26px 56px -18px rgba(0, 0, 0, .8); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --ground: #1C1C1B; --shelf: #2B2B29; --paper: #FFFFFF; --edge: #BDBBB5; --ink: #ECEAE5; --muted: #A09E97;
-  --line: #3B3A37; --panel: rgba(28, 28, 27, .92); --ind: #CDA96F; --arq: #D59C94; --tec: #8EABC6;
+  --line: #3B3A37; --panel: rgba(28, 28, 27, .92); --ind: #CDA96F; --arq: #D59C94; --tec: #8EABC6; --imp: #97BFAC;
   --shade: rgba(0, 0, 0, .35); --drop: 0 1px 2px rgba(0, 0, 0, .4), 0 26px 56px -18px rgba(0, 0, 0, .8); color-scheme: dark;
 }
 [data-book="industrial"] { --accent: var(--ind); }
 [data-book="arquitectura"] { --accent: var(--arq); }
 [data-book="tecnico"] { --accent: var(--tec); }
+[data-book="video"] { --accent: var(--imp); }
 
 html, body { height: 100%; }
 body { background: var(--ground); color: var(--ink); font-family: var(--font); font-weight: 300; font-size: 15px; line-height: 1.6; }
@@ -78,7 +80,7 @@ button, select { font: inherit; color: inherit; }
 .masthead h1 { margin: 14px 0 0; font-weight: 200; font-size: clamp(30px, 5.2vw, 64px); line-height: 1.05; letter-spacing: .14em; text-transform: uppercase; text-wrap: balance; }
 .masthead .role { margin-top: 14px; font-size: 12px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase; color: var(--muted); }
 .masthead .lead { margin: 0; max-width: 34ch; font-size: 15px; color: var(--muted); text-align: right; }
-.shelf { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(28px, 4vw, 56px); padding-bottom: 28px; border-bottom: 1px solid var(--line); position: relative; }
+.shelf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(28px, 4vw, 56px); padding-bottom: 28px; border-bottom: 1px solid var(--line); position: relative; }
 .book-card { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
 .book-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 10px; }
 .volume { position: relative; aspect-ratio: 16 / 9; max-width: 100%; transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
@@ -108,23 +110,11 @@ button, select { font: inherit; color: inherit; }
   .masthead .lead { text-align: left; }
 }
 
-/* ------------------------------------------------ desarrollo: plataforma 4D (bloque de portada y video) */
-.feature { --accent: var(--tec); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(28px, 4vw, 56px); align-items: center; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
-.feat-media { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #0B1520; box-shadow: var(--drop); }
-.feat-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
-.feat-media:hover img, .feat-media:focus-visible img { transform: scale(1.025); }
-.feat-media:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
-.play { position: absolute; right: 14px; bottom: 14px; width: 54px; height: 54px;   /* en la esquina: el póster lleva el título */ border-radius: 50%; background: rgba(255, 255, 255, .92); display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
-.play svg { width: 20px; height: 20px; fill: #252523; margin-left: 3px; }
-.feat-text { grid-column: span 2; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.feat-text .kicker { color: var(--accent); }
-.feat-text h2 { margin: 0; font-weight: 300; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; letter-spacing: .02em; }
-.feat-text p { margin: 0; color: var(--muted); max-width: 52ch; }
-.feat-stats { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; letter-spacing: .06em; color: var(--muted); }
-.feat-stats b { display: block; font-weight: 200; font-size: 30px; line-height: 1.15; letter-spacing: 0; color: var(--ink); }
-.cta { align-self: flex-start; margin-top: 6px; padding-bottom: 2px; border-bottom: 1px solid transparent; font-size: 11px; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
-.cta:hover, .cta:focus-visible { border-color: var(--accent); }
-.vview { --accent: var(--tec); position: fixed; inset: 0; z-index: 10; background: var(--ground); display: grid; grid-template-rows: auto minmax(0, 1fr); }
+/* ------------------------------------------------ 04 · video de la plataforma 4D (tarjeta de la repisa y sección #video) */
+.book-card.is-video .volume::before, .book-card.is-video .volume::after { display: none; }   /* no es libro: sin canto ni lomo */
+.play { position: absolute; z-index: 1; right: 12px; bottom: 12px; width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, .92); display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0, 0, 0, .3); }
+.play svg { width: 18px; height: 18px; fill: #252523; margin-left: 3px; }
+.vview { --accent: var(--imp); position: fixed; inset: 0; z-index: 10; background: var(--ground); display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .vview[hidden] { display: none !important; }
 .vbody { overflow-y: auto; padding: clamp(16px, 3vw, 36px) var(--gutter) 48px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
 .vbody video { display: block; width: min(100%, 1400px, calc((100dvh - 200px) * 16 / 9)); aspect-ratio: 16 / 9; background: #0B1520; box-shadow: var(--drop); }
@@ -133,12 +123,14 @@ button, select { font: inherit; color: inherit; }
 .benefits { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .benefits li { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .benefits b { font-weight: 500; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink); }
-@media (max-width: 860px) {
-  .feature, .vinfo, .benefits { grid-template-columns: minmax(0, 1fr); }
-  .feat-text { grid-column: auto; }
+@media (max-width: 1180px) {
+  .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .feat-media img { transition: none; }
+@media (max-width: 860px) {
+  .vinfo, .benefits { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .shelf { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ------------------------------------------------ visor */
@@ -235,28 +227,10 @@ select.jump { height: 36px; border: 1px solid var(--line); background: var(--gro
       <h1>Dominic Soto Aguilar</h1>
       <div class="role">Arquitecto · Modelado y coordinación BIM</div>
     </div>
-    <p class="lead">Elige un portafolio para hojearlo como libro o recorrer sus láminas en galería.</p>
+    <p class="lead">Elige un portafolio para hojearlo como libro o recorrer sus láminas en galería, o mira la implementación BIM + IA en video.</p>
   </header>
 
   <section class="shelf" id="shelf" aria-label="Portafolios"></section>
-
-  <section class="feature" aria-labelledby="featTitle">
-    <a class="feat-media" href="#video" aria-label="Ver el video de la plataforma 4D">
-      <img src="video/plataforma-4d-bim.jpg" width="1920" height="1080" loading="lazy" alt="Plataforma 4D interactiva generada a partir de un modelo de Revit">
-      <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-    </a>
-    <div class="feat-text">
-      <div class="kicker">Desarrollo · BIM + IA</div>
-      <h2 id="featTitle">Plataforma 4D interactiva</h2>
-      <p>Del modelo de Revit a una página web 4D que integra el programa de obra, las instalaciones y las cuantificaciones del proyecto. Desarrollada con agentes de IA, automatización y programación.</p>
-      <ul class="feat-stats">
-        <li><b class="num">8,019</b>elementos cuantificados</li>
-        <li><b class="num">64</b>actividades · 5 hitos</li>
-        <li><b class="num">16</b>sistemas de instalaciones</li>
-      </ul>
-      <a class="cta" href="#video">Ver video →</a>
-    </div>
-  </section>
 
   <footer class="contact">
     <span class="who">Contacto</span>
@@ -409,6 +383,21 @@ function buildShelf() {
     card.addEventListener("click", () => openBook(id, Number(store.get("page:" + id)) || 1));
     shelf.appendChild(card);
   }
+  // 04 · video de la plataforma 4D: abre la sección #video
+  const v = document.createElement("button");
+  v.className = "book-card is-video"; v.type = "button"; v.dataset.book = "video";
+  v.setAttribute("aria-label", "Ver el video Implementación BIM + IA, 2 minutos");
+  v.innerHTML = `
+      <div class="volume"><img src="video/plataforma-4d-bim.jpg" alt="Video de la plataforma 4D desarrollada a partir de un modelo de Revit"><span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></div>
+      <div class="card-meta">
+        <span class="n">04</span>
+        <h2>Implementación BIM&nbsp;+&nbsp;IA</h2>
+        <span class="pages">Video · 2:04 min</span>
+        <span class="projects">Plataforma 4D desde Revit · instalaciones, propiedades y cantidades a Excel</span>
+        <span class="open">Ver video →</span>
+      </div>`;
+  v.addEventListener("click", () => { location.hash = "video"; });
+  shelf.appendChild(v);
 }
 
 /* ---------------- visor */
