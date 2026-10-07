@@ -18,7 +18,7 @@ index.html          # TODO el sitio: HTML + CSS + JS en un solo archivo, sin bui
 pages/<libro>/pNN.webp   # láminas a tamaño completo, 2560×1440 (16:9)
 thumbs/<libro>/pNN.webp  # miniaturas, 384×216
 video/              # video de la plataforma 4D (sección #video)
-  plataforma-4d-bim.mp4   # 1920×1080, H.264 + AAC, faststart, < 25 MB
+  plataforma-4d-bim.mp4   # 2:04 min, 1920×1080, 24 fps, H.264 + AAC, faststart, < 25 MB
   plataforma-4d-bim.jpg   # póster (también la imagen del bloque de portada)
   plataforma-4d-bim.vtt   # subtítulos en español
   musica-ambiente.m4a     # pista de música sola (original, sin derechos) para remezclar con voz
@@ -71,6 +71,7 @@ python3 -m http.server 8000   # http://localhost:8000/
 
 Revisar: portada, abrir cada libro, hojear en modo libro y galería, miniaturas, zoom, enlaces `#libro-N`, ancho de móvil (~375px) y modo oscuro.
 Chromium/Playwright está disponible en el entorno remoto para capturas.
+El Chromium de Playwright no trae H.264 (`canPlayType` vacío), así que ahí el MP4 no carga: para probar `#video` intercepta la ruta del MP4 con un WebM de prueba (`page.route`) o usa Chrome.
 
 ## Convenciones
 
