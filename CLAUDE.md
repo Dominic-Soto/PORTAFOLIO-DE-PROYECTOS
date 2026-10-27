@@ -8,8 +8,8 @@ Sitio estático (GitHub Pages) con los portafolios de **Dominic Soto Aguilar** �
 Tres portafolios que se hojean como libro (con animación de página) o se recorren en galería vertical.
 
 - Sitio: https://dominic-soto.github.io/PORTAFOLIO-DE-PROYECTOS/
-- Enlaces directos: `#industrial`, `#arquitectura`, `#tecnico`, a una página: `#tecnico-12`, y al video: `#video`
-- En la repisa de la portada, junto a los tres libros, va una cuarta tarjeta **04 · Implementación BIM + IA** que abre la sección independiente del video de la plataforma 4D.
+- Enlaces directos: `#industrial`, `#arquitectura`, `#tecnico`, a una página: `#tecnico-12`, y a los videos: `#video` y `#powerbi`
+- En la repisa de la portada, debajo de los tres libros, van dos tarjetas de video de implementación: **04 · Implementación BIM + IA** (plataforma 4D, `#video`) y **05 · Coordinación BIM + Power BI** (tablero de obra, `#powerbi`). Cada una abre la sección independiente de su video.
 
 ## Estructura
 
@@ -17,18 +17,22 @@ Tres portafolios que se hojean como libro (con animación de página) o se recor
 index.html          # TODO el sitio: HTML + CSS + JS en un solo archivo, sin build
 pages/<libro>/pNN.webp   # láminas a tamaño completo, 2560×1440 (16:9)
 thumbs/<libro>/pNN.webp  # miniaturas, 384×216
-video/              # video de la plataforma 4D (sección #video)
-  plataforma-4d-bim.mp4   # 2:04 min, 1920×1080, 24 fps, H.264 + AAC, faststart, < 25 MB
-  plataforma-4d-bim.jpg   # póster (también la imagen del bloque de portada)
+video/              # videos de implementación (secciones #video y #powerbi)
+  plataforma-4d-bim.mp4   # 04 · 2:04 min, 1920×1080, 24 fps, H.264 + AAC, faststart, < 25 MB
+  plataforma-4d-bim.jpg   # póster (también la imagen de la tarjeta 04)
   plataforma-4d-bim.vtt   # subtítulos en español
   musica-ambiente.m4a     # pista de música sola (original, sin derechos) para remezclar con voz
   guion.md                # guion cronometrado para grabar la narración (no se muestra en el sitio)
+  tablero-powerbi.mp4     # 05 · 1:20 min, 1920×1080, 30 fps, H.264 + AAC, faststart, < 25 MB, sin narración (sin .vtt)
+  tablero-powerbi.jpg     # póster (también la imagen de la tarjeta 05)
+powerbi/            # material fuente del tablero Power BI: capturas 1316×740 (pNN = página del tablero) y RESUMEN.md
+                    # (de aquí salen las láminas tecnico/p37–p38; no se cargan directo en el sitio)
 og.jpg              # imagen para redes (Open Graph), 1200×630
 .nojekyll           # evita que GitHub Pages procese el sitio con Jekyll
 README.md
 ```
 
-Libros (`<libro>`): `industrial` (36 págs.), `arquitectura` (35), `tecnico` (37).
+Libros (`<libro>`): `industrial` (36 págs.), `arquitectura` (35), `tecnico` (39).
 Los archivos van numerados con dos dígitos: `p01.webp`, `p02.webp`, …
 
 ## Cómo funciona `index.html`
@@ -36,12 +40,13 @@ Los archivos van numerados con dos dígitos: `p01.webp`, `p02.webp`, …
 - **Datos**: el objeto `BOOKS` define cada libro: número, título, total de páginas y `sections` (`[nombre, página de inicio]`).
   Es la única fuente de verdad para el selector de secciones, las etiquetas de página y la lista de proyectos de la portada.
 - `PROJECT_SKIP`: secciones que *no* son proyectos (Portada, Perfil, Contacto, …); se excluyen de la lista de la tarjeta.
-- **Portada** (`#home`): repisa (`buildShelf`) con los tres libros y la tarjeta 04 del video (`.book-card.is-video`, sin canto de hojas, con botón `.play`); 4 columnas en escritorio, 2×2 debajo de 1180 px y 1 columna en móvil; datos de contacto.
-- **Video** (`#vview`): vista independiente (`openVideo`/`closeVideo`) con `<video>`, subtítulos y tres beneficios; se abre con `#video` y se cierra con «Portafolios» o Esc.
+- **Videos**: el objeto `VIDEOS` define las tarjetas 04 y 05 (número, título, archivo sin extensión, duración, resumen, texto, enlace opcional y tres beneficios). La clave es también el enlace (`#video`, `#powerbi`).
+- **Portada** (`#home`): repisa (`buildShelf`) con los tres libros y las tarjetas de video (`.book-card.is-video`, sin canto de hojas, con botón `.play`). Rejilla de 6 columnas: los libros ocupan 2 cada uno (fila de 3) y los videos van centrados en la fila de abajo; 2 columnas debajo de 980 px y 1 columna en móvil; datos de contacto.
+- **Video** (`#vview`): vista independiente (`openVideo(id)`/`closeVideo`) que se llena desde `VIDEOS`: `<video>`, subtítulos si `vtt`, texto, enlace opcional (`vLink`, p. ej. a las láminas `#tecnico-37`) y tres beneficios; `data-book` en `#vview` da el color de acento. Se cierra con «Portafolios» o Esc.
 - **Visor** (`#viewer`): modo `libro` (animación 3D con `turn()`) o `galeria`; cajón de miniaturas; zoom (`#zoom`); pantalla completa.
 - **Estado**: `S` (libro, página, modo). La última página y el modo se recuerdan en `localStorage` (envuelto en `try/catch` vía `store`).
 - **Rutas**: `route()` lee el hash de la URL (`#video` abre la sección del video).
-- **Tema**: colores como variables CSS en `:root`, con modo oscuro por `prefers-color-scheme` y `data-theme`. Color de acento por libro: `--ind`, `--arq`, `--tec`; el video usa `--imp` (`[data-book="video"]` y `.vview`).
+- **Tema**: colores como variables CSS en `:root`, con modo oscuro por `prefers-color-scheme` y `data-theme`. Color de acento por libro: `--ind`, `--arq`, `--tec`; los videos usan `--imp` (04, `[data-book="video"]`) y `--pbi` (05, `[data-book="powerbi"]`).
 - Teclado: ← → / PageUp PageDown para hojear, Home/End, `Z` zoom, Esc cierra.
 
 ## Tareas comunes
@@ -58,6 +63,10 @@ Los archivos van numerados con dos dígitos: `p01.webp`, `p02.webp`, …
 **Reemplazar el video** (p. ej. con narración grabada sobre `video/guion.md`): mantener el nombre `video/plataforma-4d-bim.mp4`, 1920×1080, H.264 (`-pix_fmt yuv420p -movflags +faststart`), AAC y < 25 MB. Para mezclar voz y música: `ffmpeg -i video.mp4 -i voz.wav -i video/musica-ambiente.m4a -filter_complex "[2:a]volume=0.35[m];[1:a][m]amix=inputs=2:duration=first[a]" -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 160k -movflags +faststart salida.mp4`. Si cambia la duración, actualizar los tiempos de `plataforma-4d-bim.vtt`.
 
 **Lámina de la plataforma 4D**: está en `industrial/p13`, `arquitectura/p10` y `tecnico/p15` (reemplazó a la lámina 4D anterior; numeración e índices sin cambio).
+
+**Láminas de Power BI**: solo en el portafolio 03, sección «Coordinación con Power BI»: `tecnico/p37` (resumen, captura «Modelo contra catálogo» y cifras) y `tecnico/p38` (seis páginas del tablero y el flujo «Cómo funciona»). Van justo antes de Contacto (p39, sin folio impreso) para no recorrer folios ni el índice de Contenido. Se generaron en HTML (Montserrat, 2560×1440) con las medidas de la lámina 4D `tecnico/p15`; acento del libro técnico `#606D81`.
+
+**Insertar láminas a media obra**: cada lámina lleva su folio impreso (abajo a la derecha) y la página Contenido (`tecnico/p06`, `industrial/p04`, …) lista «PÁG. N» de cada proyecto; insertar en medio obliga a reimprimir todos los folios siguientes y el índice. Preferir reemplazar o agregar antes de Contacto.
 
 **Cambiar textos/contacto**: están en el HTML de `#home` y en las metaetiquetas (`description`, `og:*`, `twitter:*`) del `<head>` — mantenerlas sincronizadas.
 
